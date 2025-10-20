@@ -18,6 +18,12 @@ function setup() {
 
 function draw() {
   background(220);
+
+  push();
+  fill(210, 180, 140);
+  rect(0,0,1400,500); // Map
+  pop();
+  
   rect(0,500,1400,200);
   rect(1100,500,300,200); // box w/ health, money, wave
 
@@ -47,7 +53,10 @@ function draw() {
   text("Money", 1125,550);
 
   text("Health", 1125, 600);
+  push();
+  fill(255, 0, 0);
   rect(1235, 580, 125, 25); // health bar
+  pop();
 
   text("Wave", 1125, 650);
 
