@@ -10,8 +10,6 @@ function setup() {
 }
 
 function draw() {
-  background(220);
-
   enemy1.update();  //keeps track of position
   enemy1.draw();   
 }
