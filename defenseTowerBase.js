@@ -17,6 +17,19 @@ class Tower {
     this.cost = 50; // tower costs 50 currency to place
   }
 
+  draw() {
+    // draw the engagement radius
+    noFill();
+    stroke(0, 0, 255, 50);
+    strokeWeight(2);
+    circle(this.x, this.y, this.range * 2);
+
+    // draw the towers body
+    fill(0, 100, 255);
+    noStroke();
+    circle(this.x, this.y, this.size);
+    }
+
   findTarget(enemy) {
     // calculates the distance to the enemy
     let d = dist(this.x, this.y, enemy.x, enemy.y);
@@ -58,5 +71,11 @@ class Bullet {
     // check for a collision using distance
     let d = dist(this.x, this.y, enemy.x, enemy.y);
     return d < this.radius + enemy.radius;
+  }
+
+  draw() {
+    fill(255, 255, 0);
+    noStroke();
+    circle(this.x, this.y, this.radius * 2);
   }
 }
