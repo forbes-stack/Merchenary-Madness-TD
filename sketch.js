@@ -8,4 +8,7 @@ function draw() {
   rect(1100,500,300,200);
 
   rect(50, 525, 50,50);
+
+  enemy.draw();
+  
 }
