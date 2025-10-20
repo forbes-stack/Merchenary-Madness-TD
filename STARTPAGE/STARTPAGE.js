@@ -16,10 +16,13 @@ function setup() {
 
 function draw() {
   image(img, 0,0)
-  
-  textSize(70);
+ 
+  textSize(70); 
   rect(175, 25, 400, 200, 60, 60);
   text("Mercenary\n Madness", 205, 100);
+  stroke('white')
+  strokeWeight('5')
+  fill('darkkhaki')
 
   start_button.size(300, 100);
   start_button.position(220, 300);
