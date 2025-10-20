@@ -11,6 +11,9 @@ function setup() {
       y: 300
     };
   });
+
+  let firstTower = new Tower(width / 2, height / 2);
+  towers.push(firstTower);
 }
 
 function draw() {
