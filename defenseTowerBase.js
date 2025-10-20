@@ -1,15 +1,9 @@
-let towers = [];
-let bullets = [];
-let enemy;
-
-let isPlacingTower = false; // is the user dragging the tower
-let towerToPlace = null; // the tower object the user is dragging
-
 class Tower {
   constructor(x, y) {
     this.x = x;
     this.y= y;
     this.range = 50; // The tower's engagement radius in pixels
+    this.size = 30;  // <-- ADDED THIS LINE
     this.target = null;
     this.angle = 0;
     this.fireRate = 600;
@@ -28,7 +22,7 @@ class Tower {
     fill(0, 100, 255);
     noStroke();
     circle(this.x, this.y, this.size);
-    }
+  }
 
   findTarget(enemy) {
     // calculates the distance to the enemy
