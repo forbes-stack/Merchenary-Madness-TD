@@ -16,6 +16,7 @@ function draw() {
 
   rect(50, 525, 50,50);
 
+  enemy1.update();
   enemy1.draw();
 
 }
