@@ -1,5 +1,12 @@
 function setup() {
   createCanvas(1400, 675);
+
+  enemy1 = new Enemy(0, 300, 1.5, 50, function(t) {
+    return {
+      x: t,  //No path formula yet, just moves horizontally over time for now 
+      y: 300
+    };
+  });
 }
 
 function draw() {
@@ -36,4 +43,8 @@ function draw() {
   rect(1235, 580, 125, 25); // health bar
   
   text("Wave", 1125, 650);
+
+  enemy1.update();
+  enemy1.draw();
+
 }
