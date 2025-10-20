@@ -7,6 +7,8 @@ function setup() {
       y: 300
     };
   });
+
+  tower1 = new Tower(300, 300);
 }
 
 function draw() {
@@ -46,5 +48,7 @@ function draw() {
 
   enemy1.update();
   enemy1.draw();
+
+tower1.draw();
 
 }
