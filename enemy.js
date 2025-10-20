@@ -3,7 +3,7 @@ let enemy1;
 function setup() {
   enemy1 = new Enemy(0, 300, 1.5, 50, function(t) {
     return {
-      x: t,   
+      x: t,  //No path formula yet, just moves horizontally over time for now 
       y: 300
     };
   });
@@ -12,7 +12,7 @@ function setup() {
 function draw() {
   background(220);
 
-  enemy1.update();  
+  enemy1.update();  //keeps track of position
   enemy1.draw();   
 }
 
