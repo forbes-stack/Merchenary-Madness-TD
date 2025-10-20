@@ -1,11 +1,39 @@
 function setup() {
-  createCanvas(1400, 650);
+  createCanvas(1400, 675);
 }
 
 function draw() {
   background(220);
   rect(0,500,1400,200);
-  rect(1100,500,300,200);
+  rect(1100,500,300,200); // box w/ health, money, wave
 
+  // tower selection boxes
   rect(50, 525, 50,50);
+  rect(50, 625, 50,50);
+  
+  rect(200, 525, 50,50);
+  rect(200, 625, 50,50);
+  
+  rect(350, 525, 50,50);
+  rect(350, 625, 50,50);
+  
+  rect(500, 525, 50,50);
+  rect(500, 625, 50,50);
+  
+  rect(650, 525, 50,50);
+  rect(650, 625, 50,50);
+  
+  rect(800, 525, 50,50);
+  rect(800, 625, 50,50);
+  
+  rect(950, 525, 50,50);
+  rect(950, 625, 50,50);
+  
+  textSize(30);
+  text("Money", 1125,550);
+  
+  text("Health", 1125, 600);
+  rect(1235, 580, 125, 25); // health bar
+  
+  text("Wave", 1125, 650);
 }
