@@ -26,7 +26,7 @@ bg = loadImage("assets/Wild_West_Bg.png")
 function setup() {
   createCanvas(1400, 675);
 
-  tower1 = new Tower(200, 325, 30, 2, 1);
+  tower1 = new Tower(200, 325, 100, 2, 1);
   enemy1 = new Enemy(pathCords, 1, 100);
 }
 
@@ -34,6 +34,8 @@ function draw() {
   background(220); 
   image(bg, 0, 0, 1400, 500);
 
+fill(240, 200, 135);
+rect(0, 500, 1400, 675);
 
   enemy1.update();
   enemy1.draw();
