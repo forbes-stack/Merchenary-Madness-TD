@@ -1,9 +1,9 @@
 let start_button;
 let settings_button;
-let img
+let start_bg
 
 function preload() {
-  img = loadImage('STARTPAGE_BACKGROUND.png')
+  start_bg = loadImage('STARTPAGE_BACKGROUND.png')
 }
 
 function setup() {
@@ -15,7 +15,7 @@ function setup() {
 }
 
 function draw() {
-  image(img, 0,0)
+  image(start_bg, 0,0)
  
   textSize(70); 
   rect(175, 25, 400, 200, 60, 60);
