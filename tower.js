@@ -29,11 +29,15 @@ class Tower{
     }
 
     draw() {
+        
         fill(100, 100, 255);
     circle(this.x, this.y, 30);
 
+
     noFill();
+
     stroke(0, 0, 255, 50);
     circle(this.x, this.y, this.range * 2);
+
     }
 }

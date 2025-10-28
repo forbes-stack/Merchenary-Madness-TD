@@ -13,15 +13,19 @@ class Tower {
 
   draw() {
     // draw the engagement radius
+    push();
     noFill();
     stroke(0, 0, 255, 50);
     strokeWeight(2);
     circle(this.x, this.y, this.range * 2);
+    pop();
 
     // draw the towers body
+    push();
     fill(0, 100, 255);
     noStroke();
     circle(this.x, this.y, this.size);
+    pop();
   }
 
   findTarget(enemy) {
@@ -68,8 +72,10 @@ class Bullet {
   }
 
   draw() {
+    push();
     fill(255, 255, 0);
     noStroke();
     circle(this.x, this.y, this.radius * 2);
+    pop();
   }
 }
