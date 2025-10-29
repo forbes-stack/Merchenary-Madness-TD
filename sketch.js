@@ -12,10 +12,6 @@ function preload() {
 function setup() {
   createCanvas(1400, 675);
 
-<<<<<<< Updated upstream
-  tower1 = new Tower(200, 325, 100, 2, 1);
-  enemy1 = new Enemy(pathCords, 1, 100);
-=======
   // Create Path object instead of hardcoded array
   path = new Path([
     {x: 220, y: 440},
@@ -39,18 +35,12 @@ function setup() {
   ui = new UI(path); // Pass path to UI
   tower1 = new Tower(200, 325, 30, 2, 1);
   enemy1 = new Enemy(path.points, 1, 100);
->>>>>>> Stashed changes
 }
 
 function draw() {
   background(220);
 
-<<<<<<< Updated upstream
-fill(240, 200, 135);
-rect(0, 500, 1400, 675);
-=======
   ui.display();
->>>>>>> Stashed changes
 
   // Draw and move enemy
   enemy1.update();
