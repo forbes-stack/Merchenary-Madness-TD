@@ -1,7 +1,7 @@
 
 // General enemy object
 class Enemy {
-  constructor(path, speed, health, currency = 100) {
+  constructor(path, speed, health) {
     //just the path
     this.path = path
    this.speed = speed;
@@ -11,7 +11,6 @@ this.alive = true;
 this.pathIndex = 1;
 this.x = path[0].x;
 this.y = path[0].y;
-this.currency = currency;
   }
 
   // moves the enemy to the target point
