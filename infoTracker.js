@@ -23,6 +23,20 @@ class InfoTracker {
             noLoop();
         }
     }
-}
 
-//still WIP.
+    /**
+     * Increases player currency.
+     * @param {number} amount Amount of currency to gain.
+     */
+    addCurrency(amount) {
+        this.currency += amount;
+    }
+
+    /**
+     * Advances the game to the next round.
+     */
+    nextRound() {
+        this.round++;
+        this.addCurrency(50 + this.round * 5); // adds currency for completing round.
+    }
+}
