@@ -1,11 +1,7 @@
 
 // General enemy object
 class Enemy {
-<<<<<<< HEAD
   constructor(path, speed, health, currency) {
-=======
-  constructor(path, speed, health, currency = 100) {
->>>>>>> 2aeb38b0780dc539938e3e9f84979ba0b951b076
     //just the path
     this.path = path
    this.speed = speed;
