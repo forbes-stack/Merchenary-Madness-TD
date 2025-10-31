@@ -1,12 +1,13 @@
-class basicEnemy{
+class basicEnemy extends Enemy{
     
 constructor(path){
     super(path, 2, 100, 10)
 }
 
 draw(){
-push;
+push();
 fill(0, 0, 255);
-circ(this.x, this.y, 20)
+circle(this.x, this.y, 20)
+Pop();
 }
 }

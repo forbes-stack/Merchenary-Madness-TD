@@ -35,6 +35,8 @@ function setup() {
   ui = new UI(path); // Pass path to UI
   tower1 = new Tower(200, 325, 30, 2, 1);
   enemy1 = new Enemy(path.points, 1, 100);
+
+  fastEnemy = new fastEnemy();
 }
 
 function draw() {
