@@ -33,7 +33,11 @@ function setup() {
   ]);
 
   ui = new UI(path); // Pass path to UI
+<<<<<<< Updated upstream
+  tower1 = new Tower(200, 325, 50, 2, 1);
+=======
   tower1 = new Tower(200, 325, 30, 2, 1);
+>>>>>>> Stashed changes
   enemy1 = new Enemy(path.points, 1, 100);
 
   fastEnemy = new fastEnemy();
