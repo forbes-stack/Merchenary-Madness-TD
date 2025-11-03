@@ -52,7 +52,7 @@ class InfoTracker {
 
         // 1. Currency Tracker (Replaces "Money")
         push();
-        fill(255, 215, 0);
+        fill(218, 165, 32);
         textSize(30);
         textAlign(LEFT, CENTER);
         noStroke();
@@ -95,7 +95,7 @@ class InfoTracker {
 
         // 3. Round Number Tracker (Replaces "Wave")
         push();
-        fill(255);
+        fill(0);
         textSize(30);
         textAlign(LEFT, CENTER);
         noStroke();
