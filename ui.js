@@ -1,5 +1,3 @@
-//UI code
-
 class UI {
   constructor(path) {
     this.path = path; // store reference to path
