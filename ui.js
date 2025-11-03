@@ -1,4 +1,4 @@
-//UI code 
+//UI code
 
 class UI {
   constructor(path) {

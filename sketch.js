@@ -3,6 +3,7 @@ let path;
 let ui;
 let tower1;
 let enemy1;
+let info;
 
 // Load assets
 function preload() {
@@ -33,6 +34,7 @@ function setup() {
   ]);
 
   ui = new UI(path); // Pass path to UI
+  info = new InfoTracker(100, 1);
   tower1 = new Tower(200, 325, 50, 2, 1);
   enemy1 = new fastEnemy(path.points);
 
@@ -57,6 +59,8 @@ function draw() {
 
   // Optional: draw the path outline for testing
   path.display();
+
+  info.draw();
 }
 
 function mousePressed() {
