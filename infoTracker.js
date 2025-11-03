@@ -46,9 +46,19 @@ class InfoTracker {
      */
     draw() {
         // --- Settings for Bottom-Right Panel ---
-        let panelX = 1125;
-        let panelY = 500;
-        let panelW = 300; // Panel width
+
+        // 1. Define the panel's dimensions
+        let panelW = 300; // The fixed width of your UI panel
+        let panelH = 200; // A fixed height for your panel (adjust as needed)
+
+        // 2. Calculate position based on p5.js 'width' and 'height'
+        // This anchors the top-left corner of your panel relative
+        // to the bottom-right of the screen.
+        let panelX = width - panelW;
+        let panelY = height - panelH;
+
+        // All your other drawing code can now stay the same,
+        // as it's already relative to panelX and panelY.
 
         // 1. Currency Tracker (Replaces "Money")
         push();
@@ -56,6 +66,7 @@ class InfoTracker {
         textSize(30);
         textAlign(LEFT, CENTER);
         noStroke();
+        // This text is now drawn at (width - 300 + 25)
         text(`💰 Gold: ${this.currency}`, panelX + 25, panelY + 50);
         pop();
 
