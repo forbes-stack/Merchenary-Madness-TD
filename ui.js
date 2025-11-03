@@ -1,8 +1,3 @@
-<<<<<<< Updated upstream
-//UI code
-
-=======
->>>>>>> Stashed changes
 class UI {
   constructor(path) {
     this.path = path; // store reference to path
