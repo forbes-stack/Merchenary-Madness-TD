@@ -5,6 +5,7 @@ let tower1;
 let enemy1;
 let uiBg;
 let info;
+let enemy2Spawned = false;
 
 // Load assets
 function preload() {
@@ -36,16 +37,10 @@ function setup() {
   ]);
 
   ui = new UI(path); // Pass path to UI
-<<<<<<< Updated upstream
-  info = new InfoTracker(100, 1);
-  tower1 = new Tower(200, 325, 50, 2, 1);
-  enemy1 = new fastEnemy(path.points);
-
-  ;
-=======
   tower1 = new Tower(200, 325, 30, 2, 1);
   enemy1 = new Enemy(path.points, 1, 100);
->>>>>>> Stashed changes
+
+
 }
 
 function draw() {
@@ -56,6 +51,16 @@ function draw() {
   // Draw and move enemy
   enemy1.update();
   enemy1.draw();
+
+   if (millis() > 2000 && !enemy2Spawned) {
+    enemy2 = new Enemy(path.points, 1, 100, 100);
+    enemy2Spawned = true;
+  }
+
+if (enemy2Spawned) {
+    enemy2.update();
+    enemy2.draw();
+  }
 
   // Draw tower and handle attacks
   tower1.draw();
