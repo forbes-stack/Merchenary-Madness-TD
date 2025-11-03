@@ -3,6 +3,7 @@ let path;
 let ui;
 let tower1;
 let enemy1;
+let enemy2;          // <-- declare enemy2
 let uiBg;
 let info;
 let enemy2Spawned = false;
@@ -36,34 +37,36 @@ function setup() {
     {x: 1258, y: 351}
   ]);
 
-  ui = new UI(path); // Pass path to UI
+  // Pass assets into UI so it can render background and palette with tower objects
+  ui = new UI(path, { bg, uiBg });
+
   info = new InfoTracker(100, 1);
+
+  // Existing sample tower & enemy (kept as-is; placed towers via UI are separate)
   tower1 = new Tower(200, 325, 30, 2, 1);
   enemy1 = new Enemy(path.points, 1, 100);
-
-
 }
 
 function draw() {
   background(220);
 
+  // UI (draws bg, palette tiles, placed towers, and ghost tower while dragging)
   ui.display();
 
-  // Draw and move enemy
+  // Enemies
   enemy1.update();
   enemy1.draw();
 
-   if (millis() > 2000 && !enemy2Spawned) {
+  if (millis() > 2000 && !enemy2Spawned) {
     enemy2 = new Enemy(path.points, 1, 100, 100);
     enemy2Spawned = true;
   }
-
-if (enemy2Spawned) {
+  if (enemy2Spawned) {
     enemy2.update();
     enemy2.draw();
   }
 
-  // Draw tower and handle attacks
+  // Existing sample tower drawing/attack (independent of UI-placed towers)
   tower1.draw();
   let distEnemy = dist(tower1.x, tower1.y, enemy1.x, enemy1.y);
   if (distEnemy <= tower1.range) {
@@ -73,13 +76,28 @@ if (enemy2Spawned) {
   // Optional: draw the path outline for testing
   path.display();
 
+  // HUD
   info.draw();
 }
 
+// Forward mouse events to UI so TowerDragger can do its thing
 function mousePressed() {
   ui.mousePressed();
 }
 
+function mouseDragged() {
+  if (ui.mouseDragged) ui.mouseDragged();
+}
+
+function mouseMoved() {
+  if (ui.mouseMoved) ui.mouseMoved();
+}
+
 function mouseReleased() {
   ui.mouseReleased();
+}
+
+// (Optional) keep things responsive
+function windowResized() {
+  resizeCanvas(windowWidth, windowHeight);
 }

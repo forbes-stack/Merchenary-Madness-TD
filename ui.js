@@ -1,94 +1,98 @@
+// UI.js
 class UI {
-  constructor(path) {
-    this.path = path; // store reference to path
+  constructor(path, assets = {}) {
+    this.path = path;
+
+    // Map area where towers are allowed
     this.dropZone = { x: 0, y: 0, w: 1400, h: 500 };
 
-    this.towers = [
-      { x: 75, y: 550, r: 45, color: color(0), type: "basic" },
+    // Define available tower templates shown in the palette
+    // (tune these numbers as you like)
+    this.towerTypes = [
+      { type: "basic", range: 120, damage: 1, rate: 0.5 },
+      // Add more: { type: "slow", range: 140, damage: 0.5, rate: 0.8 }, ...
     ];
+
+    // Palette slots (tile centers) => which tower type each tile represents
+    this.paletteSlots = [
+      { x: 75,  y: 550, type: "basic" },
+      // e.g. { x: 200, y: 550, type: "slow" },
+    ];
+
     this.placedTowers = [];
 
-    this.dragging = false;
-    this.draggedTower = null;
-    this.bg = bg;
-    this.uiBg = uiBg;
+    // Compose the dragger with the templates and drop zone
+    this.dragger = new TowerDragger(this.towerTypes, this.dropZone);
+
+    this.bg = assets.bg;   // optional background image
+    this.uiBg = assets.uiBg;
   }
 
   display() {
     background(220);
-    image(this.bg, 0, 0, windowWidth, windowHeight-200);
+    if (this.bg) {
+      image(this.bg, 0, 0, windowWidth, windowHeight - 200);
+    }
 
-    // Bottom UI panels
-    
+    // (Optional) visualize drop zone while testing
+    // push(); noFill(); stroke(0,120); rect(this.dropZone.x, this.dropZone.y, this.dropZone.w, this.dropZone.h); pop();
 
-    // Tower selection boxes
-    let boxes = [
-      [50, 525], [50, 625], [200, 525], [200, 625],
-      [350, 525], [350, 625], [500, 525], [500, 625],
-      [650, 525], [650, 625], [800, 525], [800, 625],
+    // --- Palette tiles (boxes) ---
+    const boxes = [
+      [50, 525], [50, 625],
+      [200, 525], [200, 625],
+      [350, 525], [350, 625],
+      [500, 525], [500, 625],
+      [650, 525], [650, 625],
+      [800, 525], [800, 625],
       [950, 525], [950, 625]
     ];
-    for (let [x, y] of boxes) rect(x, y, 50, 50);
+    for (let [x, y] of boxes) {
+      rect(x, y, 50, 50);
+    }
 
-    // Tower icons
-    for (let t of this.towers) {
+    // --- Palette icons (render each slot’s tower type) ---
+    for (let slot of this.paletteSlots) {
+      const base = this.towerTypes.find(t => t.type === slot.type);
+      if (!base) continue;
+
+      // simple icon: a circle matching tower body style
       push();
-      fill(t.color);
       noStroke();
-      circle(t.x, t.y, t.r);
+      fill(100, 100, 255);      // same color as Tower.draw()
+      circle(slot.x, slot.y, 30);
       pop();
     }
 
-    // Placed towers
+    // --- Placed towers ---
     for (let t of this.placedTowers) {
-      push();
-      fill(t.color);
-      noStroke();
-      circle(t.x, t.y, t.r);
-      pop();
+      t.draw();
     }
 
-    // Tower being dragged
-    if (this.dragging && this.draggedTower) {
-      push();
-      fill(this.draggedTower.color);
-      noStroke();
-      circle(mouseX, mouseY, this.draggedTower.r);
-      pop();
-    }
+    // --- Dragging preview (ghost tower + range) ---
+    this.dragger.drawPreview();
   }
 
+  // Hook these up to p5’s global mouse callbacks
   mousePressed() {
-    // Start dragging tower if clicked on icon
-    for (let t of this.towers) {
-      let d = dist(mouseX, mouseY, t.x, t.y);
-      if (d < t.r / 2) {
-        this.draggedTower = { ...t };
-        this.dragging = true;
+    // Start dragging when clicking a palette icon
+    for (let slot of this.paletteSlots) {
+      const d = dist(mouseX, mouseY, slot.x, slot.y);
+      if (d < 30 / 2 + 10) { // small hitbox padding
+        this.dragger.startDrag(slot.type, mouseX, mouseY);
         break;
       }
     }
   }
 
-  mouseReleased() {
-    if (this.dragging && this.draggedTower) {
-      // Check if released inside map area
-      if (
-        mouseX > this.dropZone.x &&
-        mouseX < this.dropZone.x + this.dropZone.w &&
-        mouseY > this.dropZone.y &&
-        mouseY < this.dropZone.y + this.dropZone.h
-      ) {
-        // Prevent tower from being placed on the path
-        if (!this.path.isOnPath(mouseX, mouseY)) {
-          this.placedTowers.push({ ...this.draggedTower, x: mouseX, y: mouseY });
-        } else {
-          console.log("❌ Tower cannot be placed on the path!");
-        }
-      }
+  mouseDragged() {
+    this.dragger.updateDrag(mouseX, mouseY);
+  }
+  mouseMoved() {
+    this.dragger.updateDrag(mouseX, mouseY);
+  }
 
-      this.draggedTower = null;
-      this.dragging = false;
-    }
+  mouseReleased() {
+    this.dragger.endDrag(this.path, this.placedTowers);
   }
 }
