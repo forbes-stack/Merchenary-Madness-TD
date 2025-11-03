@@ -32,16 +32,6 @@ class UI {
     ];
     for (let [x, y] of boxes) rect(x, y, 50, 50);
 
-    // Stats
-    textSize(30);
-    text("Money", 1125, 550);
-    text("Health", 1125, 600);
-    push();
-    fill(255, 0, 0);
-    rect(1235, 580, 125, 25);
-    pop();
-    text("Wave", 1125, 650);
-
     // Tower icons
     for (let t of this.towers) {
       push();
