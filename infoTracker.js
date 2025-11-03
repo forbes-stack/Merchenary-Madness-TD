@@ -1,3 +1,4 @@
+// infoTracker.js
 class InfoTracker {
     /**
      *
@@ -44,51 +45,64 @@ class InfoTracker {
      * Draws all UI Tracker elements (health bar, currency, round number)
      */
     draw() {
-        // 1. Health Bar
-        let barWidth = 200;
-        let barHeight = 25;
-        let xPos = 20;
-        let yPos= 20;
+        // --- Settings for Bottom-Right Panel ---
+        let panelX = 1125;
+        let panelY = 500;
+        let panelW = 300; // Panel width
 
-        //Health bar background
+        // 1. Currency Tracker (Replaces "Money")
+        push();
+        fill(218, 165, 32);
+        textSize(30);
+        textAlign(LEFT, CENTER);
+        noStroke();
+        text(`💰 Gold: ${this.currency}`, panelX + 25, panelY + 50);
+        pop();
+
+
+        // 2. Health Bar (Replaces "Health")
+        let barWidth = panelW - 50; // Make it fit the panel
+        let barHeight = 25;
+        let xPos = panelX + 25;
+        let yPos = panelY + 80; // Below "Money"
+
+        // Calculate current health width
+        let currentHealthWidth = map(this.health, 0, this.maxHealth, 0, barWidth);
+
+        //Health bar background (the empty part)
         push();
         fill(255, 0, 0);
         noStroke();
+        rect(xPos, yPos, barWidth, barHeight, 5);
+        pop();
+
+        //Health bar foreground (the green part)
+        push();
+        fill(0, 255, 0);
+        noStroke();
+        // Draw the current health width
         rect(xPos, yPos, currentHealthWidth, barHeight, 5);
         pop();
 
-        // Health label
+        // Health label (on top of the bar)
         push();
         fill(0);
         textSize(18);
         textAlign(CENTER, CENTER);
-        text('Health: ${this.health} / ${this.maxHealth}`, xPos + barWidth / 2, yPos + barHeight / 2');
+        text(`${this.health} / ${this.maxHealth}`, xPos + barWidth / 2, yPos + barHeight / 2);
         pop();
 
-        // 2. Currency Tracker
-        let currencyX = 20;
-        let currencyY = height - 30;
 
+        // 3. Round Number Tracker (Replaces "Wave")
         push();
-        fill(255, 215, 0);
-        textSize(25);
+        fill(0);
+        textSize(30);
         textAlign(LEFT, CENTER);
         noStroke();
-        text('💰 Gold: ${this.currency}`, currencyX, currencyY');
+        text(`Round: ${this.round}`, panelX + 25, panelY + 150);
         pop();
 
-        // 3. Round Number Tracker
-        let roundX = width - 20;
-        let roundY = 30;
-
-        push();
-        fill(255);
-        textSize(25);
-        textAlign(RIGHT, CENTER);
-        noStroke();
-        text('Round: ${this.round}`, roundX, roundY');
-        pop();
-
+        // Reset alignment
         textAlign(LEFT, BASELINE);
     }
 }
