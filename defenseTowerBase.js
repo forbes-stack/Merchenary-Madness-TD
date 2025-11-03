@@ -1,4 +1,4 @@
-class Tower {
+class TowerBase {
   constructor(x, y) {
     this.x = x;
     this.y= y;
