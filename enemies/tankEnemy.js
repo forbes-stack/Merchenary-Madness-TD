@@ -8,6 +8,6 @@ draw(){
 push();
 fill(255, 0, 0);
 circle(this.x, this.y, 30)
-Pop();
+pop();
 }
 }

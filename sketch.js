@@ -3,14 +3,16 @@ let path;
 let ui;
 let tower1;
 let enemy1;
+let uiBg;
 
 // Load assets
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
+  uiBg = loadImage("assets/woodBack.png");
 }
 
 function setup() {
-  createCanvas(1400, 675);
+  createCanvas(windowWidth, windowHeight);
 
   // Create Path object instead of hardcoded array
   path = new Path([

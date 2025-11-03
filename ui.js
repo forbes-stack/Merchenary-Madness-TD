@@ -13,15 +13,15 @@ class UI {
     this.dragging = false;
     this.draggedTower = null;
     this.bg = bg;
+    this.uiBg = uiBg;
   }
 
   display() {
     background(220);
-    image(this.bg, this.dropZone.x, this.dropZone.y, this.dropZone.w, this.dropZone.h);
+    image(this.bg, 0, 0, windowWidth, windowHeight-200);
 
     // Bottom UI panels
-    rect(0, 500, 1400, 200);
-    rect(1100, 500, 300, 200);
+    
 
     // Tower selection boxes
     let boxes = [

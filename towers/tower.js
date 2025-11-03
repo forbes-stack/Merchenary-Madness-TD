@@ -1,4 +1,3 @@
-//general tower class
 
 class Tower{
     constructor(x, y, range, damage, rate){
