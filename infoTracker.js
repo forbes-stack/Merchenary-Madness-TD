@@ -10,7 +10,7 @@ class InfoTracker {
         this.health = startHealth;
         this.currency = 50;
         this.round = startRound;
-        this.isGameOver = false; // <-- ADDED THIS FLAG
+        this.isGameOver = false;
     }
 
     /**
@@ -26,10 +26,7 @@ class InfoTracker {
             this.health = 0;
             console.log("Game Over"); // game ends when user health hits 0.
 
-            // --- MODIFICATION ---
-            // Instead of stopping the draw loop, we set a flag
-            // noLoop(); // <-- REMOVED THIS
-            this.isGameOver = true; // <-- ADDED THIS
+            this.isGameOver = true;
         }
     }
 
@@ -60,8 +57,6 @@ class InfoTracker {
         let panelX = width - panelW ; // 20px padding from edge
         let panelY = height - panelH ; // 20px padding from edge
 
-        // --- Draw Panel Background (using uiBg if available) ---
-        // This assumes uiBg is loaded and you want to use it
         if (typeof uiBg !== 'undefined') {
             image(uiBg, panelX, panelY, panelW, panelH);
         } else {
