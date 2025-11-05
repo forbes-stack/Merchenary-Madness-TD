@@ -5,15 +5,19 @@ let start_button,
     mousePress = false, 
     settingsLoaded = false, 
     mapLoaded = false,
-    sources = ['enemies/enemy.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
-               'towers/tower.js', 'defenseTowerBase.js',
-               'path.js', 'ui.js', 'map.js', 'sketch.js'
+
+    //each js script for map.js
+    sources = ['map.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
+               'towers/tower.js', 'towerDragger.js',
+               'path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js'
               ]
     page = 'home'; 
 
 function preload() { 
   img = loadImage('assets/start.png') 
   img2 = loadImage('assets/settings_bg.png')
+  bg = loadImage("assets/Wild_West_Bg.png");
+  uiBg = loadImage("assets/woodBack.png");
 } 
 
 function setup() { 
@@ -36,6 +40,8 @@ function setup() {
 } 
 
 function draw() { 
+
+  //background images
   if (page == 'home') { 
     image(img, 0, 0)
   } 
@@ -47,7 +53,7 @@ function draw() {
   
   //Actual Page Changing
 
-  //(Step 2)
+  //(Step 1)
   if (page === 'map' && !mapLoaded) { 
     mapLoaded = "loading";
     loadScript(sources, () => { 
@@ -56,7 +62,7 @@ function draw() {
     }); 
   }
   
-  //(Step 2)
+  //(Step 1)
   if (page === 'settings' && !settingsLoaded) { 
     loadScript(['settings.js'], () => { 
       settingsLoaded = true;
@@ -64,17 +70,21 @@ function draw() {
     }); 
   } 
   
-  //(Step 4)
+  //(Step 3 for settings)
   if (page == 'settings' && settingsLoaded) { 
     settingsDraw(); 
   } 
+
+  if (page == 'map' && mapLoaded == true) {
+    mapDraw();
+  }
 } 
 
 
 // Functions 
 
 
-// (Step 3)
+// (Step 2)
 function loadScript(srcArray, callback) {
   let loaded = 0;
   for (let x = 0; x < srcArray.length; x++) {
@@ -89,7 +99,7 @@ function loadScript(srcArray, callback) {
   }
 }
 
-
+// determines when button is pressed
 function mousePressed() {
   if (page === 'home') {
     if (mouseX >= 220 && mouseX <= 550 && mouseY >= 300 && mouseY <= 400) {
@@ -107,6 +117,7 @@ function mousePressed() {
   }
 }
 
+//styles each button on startpage
 function styleButton(btn) {
   btn.style('font-size', '50px');
   btn.style('color', 'green');
