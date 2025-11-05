@@ -54,8 +54,8 @@ class InfoTracker {
         let panelH = 200;
 
         // Use width/height to anchor to bottom-right
-        let panelX = width - panelW ; // 20px padding from edge
-        let panelY = height - panelH ; // 20px padding from edge
+        let panelX = width - panelW; // 20px padding from edge
+        let panelY = height - panelH; // 20px padding from edge
 
         if (typeof uiBg !== 'undefined') {
             image(uiBg, panelX, panelY, panelW, panelH);

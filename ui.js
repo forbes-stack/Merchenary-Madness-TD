@@ -28,7 +28,7 @@ class UI {
     this.uiBg = assets.uiBg;
   }
 
-  display() {
+  display(info, allEnemies) {
     background(220);
     if (this.bg) {
       image(this.bg, 0, 0, windowWidth, windowHeight - 200);
@@ -66,6 +66,13 @@ class UI {
 
     // --- Placed towers ---
     for (let t of this.placedTowers) {
+      if (allEnemies && info) {
+        for (let e of allEnemies) {
+          if (e.alive) {
+            t.update(e,info);
+          }
+        }
+      }
       t.draw();
     }
 
@@ -82,6 +89,37 @@ class UI {
         this.dragger.startDrag(slot.type, mouseX, mouseY);
         break;
       }
+    }
+  }
+
+  displayGameOver() {
+    // This just draws the UI without updating anything
+
+    // --- Palette tiles (boxes) ---
+    const boxes = [
+      [50, 525], [50, 625], [200, 525], [200, 625],
+      [350, 525], [350, 625], [500, 525], [500, 625],
+      [650, 525], [650, 625], [800, 525], [800, 625],
+      [950, 525], [950, 625]
+    ];
+    for (let [x, y] of boxes) {
+      rect(x, y, 50, 50);
+    }
+
+    // --- Palette icons (render each slot’s tower type) ---
+    for (let slot of this.paletteSlots) {
+      const base = this.towerTypes.find(t => t.type === slot.type);
+      if (!base) continue;
+      push();
+      noStroke();
+      fill(100, 100, 255);
+      circle(slot.x, slot.y, 30);
+      pop();
+    }
+
+    // --- Placed towers ---
+    for (let t of this.placedTowers) {
+      t.draw(); // Only draw, don't update
     }
   }
 
