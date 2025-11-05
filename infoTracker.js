@@ -57,8 +57,8 @@ class InfoTracker {
         let panelH = 200;
 
         // Use width/height to anchor to bottom-right
-        let panelX = width - panelW - 20; // 20px padding from edge
-        let panelY = height - panelH - 20; // 20px padding from edge
+        let panelX = width - panelW ; // 20px padding from edge
+        let panelY = height - panelH ; // 20px padding from edge
 
         // --- Draw Panel Background (using uiBg if available) ---
         // This assumes uiBg is loaded and you want to use it
