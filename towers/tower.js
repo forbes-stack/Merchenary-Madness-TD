@@ -9,7 +9,7 @@ class Tower{
     this.cooldown = 0;
   }
 
-  update(enemy){
+  update(enemy, infoTracker){
     if(!enemy.alive) return;
 
     if (this.cooldown > 0) {
@@ -20,7 +20,7 @@ class Tower{
     let distEnemy = dist(this.x, this.y, enemy.x, enemy.y);
 
     if(distEnemy <= this.range) {
-      enemy.takeDamage(this.damage)
+      enemy.takeDamage(this.damage, infoTracker)
       this.cooldown = Math.ceil(this.rate * 60);
     }
   }

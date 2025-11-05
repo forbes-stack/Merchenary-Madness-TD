@@ -27,12 +27,12 @@ if (this.x < target.x) this.x += this.speed;
     Math.abs(this.y - target.y) < this.speed) {
   this.x = target.x; // snap exactly to target
   this.y = target.y;
-  this.pathIndex++;  
+  this.pathIndex++;
 }
   }
-  
+
   //Updates the state of the enemy
-  update() {
+  update(infoTracker) {
 if(!this.alive) return;
 
     if(this.pathIndex < this.path.length){
@@ -42,6 +42,7 @@ if(!this.alive) return;
       this.move(target);
 
     } else{
+      infoTracker.loseHealth(10); // user loses 10 health
       this.alive = false;
     }
   }
@@ -71,12 +72,14 @@ if(!this.alive) return;
     pop();
     }
 
-takeDamage(amount) {
+takeDamage(amount, infoTracker) {
+  if (!this.alive) return;
+
   this.health -= amount;
+
   if(this.health <= 0) {
     this.alive = false;
+    infoTracker.addCurrency(this.currency);
   }
 }
   }
-
-
