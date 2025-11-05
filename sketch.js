@@ -46,6 +46,10 @@ function setup() {
   // Existing sample tower & enemy (kept as-is; placed towers via UI are separate)
   tower1 = new Tower(200, 325, 30, 2, 1);
 
+  tower1 = new Tower(200, 325, 50, 2, 1);
+  enemy1 = new Enemy(path.points, 1, 100);
+
+
   // Give enemies health and currency values
   enemy1 = new Enemy(path.points, 1, 100, 10); // 100 health, 10 currency
 }
