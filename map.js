@@ -1,10 +1,8 @@
-let bg;
 let path;
 let ui;
 let tower1;
 let enemy1;
 let enemy2;
-let uiBg;
 let info;
 let enemy2Spawned = false;
 
