@@ -1,10 +1,12 @@
 let start_button, 
     settings_button,
-    settings_header, 
+    settings_header,
+    settings_body,
     img, 
     mousePress = false, 
     settingsLoaded = false, 
     mapLoaded = false,
+    
 
     //each js script for map.js
     sources = ['map.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
@@ -16,6 +18,7 @@ let start_button,
 function preload() { 
   img = loadImage('assets/start.png') 
   img2 = loadImage('assets/settings_bg.png')
+  img3 = loadImage('assets/home.png')
   bg = loadImage("assets/Wild_West_Bg.png");
   uiBg = loadImage("assets/woodBack.png");
 } 
@@ -48,6 +51,7 @@ function draw() {
 
   if (page == 'settings') {
     image(img2, 0, 0)
+    image(img3, 0,0,100,100)
   }
 
   
@@ -113,6 +117,13 @@ function mousePressed() {
       settings_button.hide();
       page = 'settings';
       console.log('page is settings');
+    }
+  }
+  if (page == 'settings') {
+    if (mouseX >= 0 && mouseX <= 100 && mouseY >= 0 && mouseY <= 100) {
+      setup()
+      page = 'home'
+      console.log('page is home')
     }
   }
 }
