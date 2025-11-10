@@ -7,6 +7,8 @@ let enemy2;
 let uiBg;
 let info;
 let enemy2Spawned = false;
+let towers;
+let enemies;
 
 // Load assets
 function preload() {
@@ -43,15 +45,8 @@ function setup() {
   // This is our main info tracker
   info = new InfoTracker(100, 1);
 
-  // Existing sample tower & enemy (kept as-is; placed towers via UI are separate)
-  tower1 = new Tower(200, 325, 30, 2, 1);
-
-  tower1 = new Tower(200, 325, 50, 2, 1);
-  enemy1 = new Enemy(path.points, 1, 100);
-
-
-  // Give enemies health and currency values
-  enemy1 = new Enemy(path.points, 1, 100, 10); // 100 health, 10 currency
+  waveManager = new WaveManager(waves);
+  waveManager.startWave();
 }
 
 function draw() {
@@ -65,8 +60,6 @@ function draw() {
     // Draw towers from UI
     ui.displayGameOver();
 
-    // Draw the sample tower
-    tower1.draw();
 
     // Darken the screen
     push();
@@ -96,32 +89,14 @@ function draw() {
 
   ui.display(info);
 
-  // Enemies
-  if (enemy1.alive) {
-    enemy1.update(info);
-    enemy1.draw();
-  }
+   waveManager.update(info);
+  waveManager.draw();
 
-  if (millis() > 2000 && !enemy2Spawned) {
-    enemy2 = new Enemy(path.points, 1, 100, 15); // 100 health, 15 currency
-    enemy2Spawned = true;
+  if (!waveManager.waveActive && !waveManager.isComplete()) {
+    // You can trigger next wave automatically or wait for user input
+    waveManager.startNextWave();
   }
-
-  if (enemy2Spawned && enemy2.alive) {
-    enemy2.update(info);
-    enemy2.draw();
-  }
-
-  tower1.draw();
-
-  // This tower will try to attack both enemies
-  // We call tower1.update() instead of the manual distance check
-  if (enemy1.alive) {
-    tower1.update(enemy1, info);
-  }
-  if (enemy2Spawned && enemy2.alive) {
-    tower1.update(enemy2, info);
-  }
+ 
 
   // Optional: draw the path outline for testing
   path.display();
