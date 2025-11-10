@@ -7,12 +7,7 @@ let enemy2;
 let uiBg;
 let info;
 let enemy2Spawned = false;
-<<<<<<< Updated upstream
-let towers;
-let enemies;
-=======
 let enemies = []; // central list of all enemies
->>>>>>> Stashed changes
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
@@ -48,14 +43,9 @@ function setup() {
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
-<<<<<<< Updated upstream
-  waveManager = new WaveManager(waves);
-  waveManager.startWave();
-=======
   // First enemy: 100 HP, 10 currency reward
   enemy1 = new Enemy(path.points, 1, 100, 10);
   enemies.push(enemy1);
->>>>>>> Stashed changes
 }
 
 function draw() {
@@ -65,12 +55,7 @@ function draw() {
     path.display();
     ui.displayGameOver();
 
-<<<<<<< Updated upstream
-
-    // Darken the screen
-=======
     // Darken screen
->>>>>>> Stashed changes
     push();
     fill(0, 0, 0, 150);
     rect(0, 0, width, height);
@@ -95,20 +80,6 @@ function draw() {
   // Background
   image(bg, 0, 0, width, height);
 
-<<<<<<< Updated upstream
-  ui.display(info);
-
-   waveManager.update(info);
-  waveManager.draw();
-
-  if (!waveManager.waveActive && !waveManager.isComplete()) {
-    // You can trigger next wave automatically or wait for user input
-    waveManager.startNextWave();
-  }
- 
-
-  // Optional: draw the path outline for testing
-=======
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, enemies);
 
@@ -128,7 +99,6 @@ function draw() {
   }
 
   // Optional: draw the path outline
->>>>>>> Stashed changes
   path.display();
 
   // HUD
