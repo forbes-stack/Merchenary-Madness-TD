@@ -116,7 +116,7 @@ function mouseMoved() {
   if (ui.mouseMoved) ui.mouseMoved();
 }
 function mouseReleased() {
-  ui.mouseReleased();
+  ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
 
 function windowResized() {

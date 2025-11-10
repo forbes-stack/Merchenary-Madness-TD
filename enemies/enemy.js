@@ -79,7 +79,7 @@ takeDamage(amount, infoTracker) {
 
   if(this.health <= 0) {
     this.alive = false;
-    infoTracker.addCurrency(this.currency);
+    infoTracker.addCurrency(this.currency); // kill reward for enemy
   }
 }
   }

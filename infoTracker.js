@@ -13,6 +13,8 @@ class InfoTracker {
         this.isGameOver = false;
     }
 
+
+
     /**
      * Decreases the user health by a set amount.
      * @param {number} amount Amount of health to lose.
@@ -33,6 +35,14 @@ class InfoTracker {
         }
     }
 
+     // NEW: attempt to spend currency; returns true if success
+    decreaseCurrency(amount) {
+        if (typeof amount !== "number" || amount <= 0) return false;
+        if (this.currency < amount) return false;
+        this.currency -= amount;
+        return true;
+    }
+    
     /**
      * Increases player currency.
      * @param {number} amount Amount of currency to gain.

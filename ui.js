@@ -8,9 +8,10 @@ class UI {
 
     // Tower templates in the palette
     this.towerTypes = [
-      { type: "basic", range: 120, damage: 20, rate: 0.5 },
-      // { type: "slow", range: 140, damage: 0.5, rate: 0.8 },
+    { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
+    // add more types with their own cost...
     ];
+
 
     // Palette tile centers
     this.paletteSlots = [
@@ -64,8 +65,8 @@ class UI {
       t.draw();
     }
 
-    // Dragging preview (ghost tower + range)
-    this.dragger.drawPreview();
+    // --- Dragging preview (ghost tower + range) ---
+    this.dragger.drawPreview(info, this.path);   // ← pass info + path
   }
 
   displayGameOver() {
@@ -116,7 +117,8 @@ class UI {
     this.dragger.updateDrag(mouseX, mouseY);
   }
 
-  mouseReleased() {
-    this.dragger.endDrag(this.path, this.placedTowers);
+  mouseReleased(infoTracker) {
+  this.dragger.endDrag(this.path, this.placedTowers, infoTracker);
   }
+
 }
