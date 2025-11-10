@@ -1,16 +1,19 @@
+// sketch.js
 let bg;
 let path;
 let ui;
-let tower1;
 let enemy1;
 let enemy2;
 let uiBg;
 let info;
 let enemy2Spawned = false;
+<<<<<<< Updated upstream
 let towers;
 let enemies;
+=======
+let enemies = []; // central list of all enemies
+>>>>>>> Stashed changes
 
-// Load assets
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
   uiBg = loadImage("assets/woodBack.png");
@@ -19,7 +22,7 @@ function preload() {
 function setup() {
   createCanvas(windowWidth, windowHeight);
 
-  // Create Path object instead of hardcoded array
+  // Path (polyline points)
   path = new Path([
     { x: 220, y: 440 },
     { x: 220, y: 360 },
@@ -39,40 +42,44 @@ function setup() {
     { x: 1258, y: 351 },
   ]);
 
-  // Pass assets into UI so it can render background and palette with tower objects
+  // UI (drag & drop towers)
   ui = new UI(path, { bg, uiBg });
 
-  // This is our main info tracker
+  // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
+<<<<<<< Updated upstream
   waveManager = new WaveManager(waves);
   waveManager.startWave();
+=======
+  // First enemy: 100 HP, 10 currency reward
+  enemy1 = new Enemy(path.points, 1, 100, 10);
+  enemies.push(enemy1);
+>>>>>>> Stashed changes
 }
 
 function draw() {
+  // Game Over overlay
   if (info && info.isGameOver) {
-
-
-    // Draw the background one last time
     image(bg, 0, 0, width, height);
-    // Draw the path
     path.display();
-    // Draw towers from UI
     ui.displayGameOver();
 
+<<<<<<< Updated upstream
 
     // Darken the screen
+=======
+    // Darken screen
+>>>>>>> Stashed changes
     push();
-    fill(0, 0, 0, 150); // Semi-transparent black
+    fill(0, 0, 0, 150);
     rect(0, 0, width, height);
     pop();
 
-    // Draw the HUD
     info.draw();
 
-    // Draw Game Over Text
     push();
-    fill(255, 0, 0); // Red
+    fill(255, 0, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
     stroke(0);
@@ -83,10 +90,12 @@ function draw() {
     return;
   }
 
+  // Normal game loop
 
-  // We draw the background image first
+  // Background
   image(bg, 0, 0, width, height);
 
+<<<<<<< Updated upstream
   ui.display(info);
 
    waveManager.update(info);
@@ -99,6 +108,27 @@ function draw() {
  
 
   // Optional: draw the path outline for testing
+=======
+  // UI draws palette, placed towers, and updates towers against enemies
+  ui.display(info, enemies);
+
+  // Spawn second enemy after 2 seconds
+  if (millis() > 2000 && !enemy2Spawned) {
+    enemy2 = new Enemy(path.points, 1, 100, 15); // 100 HP, 15 currency
+    enemies.push(enemy2);
+    enemy2Spawned = true;
+  }
+
+  // Update & draw all enemies
+  for (let e of enemies) {
+    if (e && e.alive) {
+      e.update(info);
+      e.draw();
+    }
+  }
+
+  // Optional: draw the path outline
+>>>>>>> Stashed changes
   path.display();
 
   // HUD
@@ -109,20 +139,16 @@ function draw() {
 function mousePressed() {
   ui.mousePressed();
 }
-
 function mouseDragged() {
   if (ui.mouseDragged) ui.mouseDragged();
 }
-
 function mouseMoved() {
   if (ui.mouseMoved) ui.mouseMoved();
 }
-
 function mouseReleased() {
   ui.mouseReleased();
 }
 
-// (Optional) keep things responsive
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
