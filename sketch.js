@@ -43,9 +43,8 @@ function setup() {
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
-  // First enemy: 100 HP, 10 currency reward
-  enemy1 = new Enemy(path.points, 1, 100, 10);
-  enemies.push(enemy1);
+    waveManager = new WaveManager(waves);
+  waveManager.startWave();
 }
 
 function draw() {
@@ -85,21 +84,9 @@ function draw() {
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, enemies);
 
-  // Spawn second enemy after 2 seconds
-  if (millis() > 2000 && !enemy2Spawned) {
-    enemy2 = new Enemy(path.points, 1, 100, 15); // 100 HP, 15 currency
-    enemies.push(enemy2);
-    enemy2Spawned = true;
-  }
-
-  // Update & draw all enemies
-  for (let e of enemies) {
-    if (e && e.alive) {
-      e.update(info);
-      e.draw();
-    }
-  }
-
+     waveManager.update(info);
+  waveManager.draw();
+  
   // Optional: draw the path outline
   path.display();
 
