@@ -97,6 +97,17 @@ function mapDraw() {
   info.draw();
 }
 
+// Forward mouse events to UI so TowerDragger can do its thing
+function mouseDragged() {
+  if (ui.mouseDragged) ui.mouseDragged();
+}
+function mouseMoved() {
+  if (ui.mouseMoved) ui.mouseMoved();
+}
+function mouseReleased() {
+  ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
+}
+
 function gameOverSetup() {
   createCanvas(700,650)
   image(gameover, 0, 0)

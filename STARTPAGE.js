@@ -138,12 +138,15 @@ function mousePressed() {
       console.log('page is settings');
     }
   }
-  if (page == 'settings') {
+  else if (page == 'settings') {
     if (mouseX >= 0 && mouseX <= 100 && mouseY >= 0 && mouseY <= 100) {
       setup()
       page = 'home'
       console.log('page is home')
     }
+  }
+  else if (page == 'map') {
+    ui.mousePressed();
   }
 }
 
