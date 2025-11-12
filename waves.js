@@ -22,6 +22,7 @@ enemies:
 }
 ]
 
+// WaveManager.js
 class WaveManager {
   constructor(wavesData) {
     this.waves = wavesData;
@@ -60,24 +61,13 @@ class WaveManager {
         if (group.timer <= 0) {
           // spawn new enemy
           let newEnemy;
-
-switch (group.type) {
-  case "basic":
-    newEnemy = new basicEnemy(path.points); // assuming your Path class stores an array of points
-    break;
-  case "tank":
-    newEnemy = new tankEnemy(path.points);
-    break;
-  case "fast":
-    newEnemy = new fastEnemy(path.points);
-    break;
-  default:
-    newEnemy = new Enemy(path.points, 2, 50, 5); // fallback
-    break;
-}
-
-this.activeEnemies.push(newEnemy);
-
+          switch (group.type) {
+            case "basic": newEnemy = new basicEnemy(path.points); break;
+            case "tank":  newEnemy = new tankEnemy(path.points);  break;
+            case "fast":  newEnemy = new fastEnemy(path.points);  break;
+            default:      newEnemy = new Enemy(path.points, 2, 50, 5); break;
+          }
+          this.activeEnemies.push(newEnemy);
 
           group.spawned++;
           group.timer = group.rate;
@@ -92,7 +82,19 @@ this.activeEnemies.push(newEnemy);
     const allDead = this.activeEnemies.every(e => !e.alive);
 
     if (allSpawned && allDead) {
+      // ORIGINAL:
+      // this.waveActive = false;
+      // this.currentWaveIndex++;
+
+      // CHANGED: end the wave, award round payout, then advance wave index
       this.waveActive = false;
+
+      // NEW: pay out based on the round that just ended, then increment round (handled in InfoTracker.nextRound)
+      if (infoTracker && typeof infoTracker.nextRound === "function") {
+        infoTracker.nextRound();
+      }
+
+      // proceed to next wave
       this.currentWaveIndex++;
     }
 
@@ -106,14 +108,14 @@ this.activeEnemies.push(newEnemy);
 
     this.frameCount++;
 
+    // auto-start next wave if there is one
     if (!this.waveActive && this.currentWaveIndex < this.waves.length) {
-    this.startWave();
-  }
+      this.startWave();
+    }
   }
 
   draw() {
-    for (let e of this.activeEnemies) 
-        e.draw();
+    for (let e of this.activeEnemies) e.draw();
   }
 
   startNextWave() {
@@ -124,3 +126,4 @@ this.activeEnemies.push(newEnemy);
     return this.currentWaveIndex >= this.waves.length;
   }
 }
+

@@ -35,7 +35,7 @@ if (this.x < target.x) this.x += this.speed;
   update(infoTracker) {
 if(!this.alive) return;
 
-    if(this.pathIndex < this.path.length-1){
+    if(this.pathIndex < this.path.length){
 
       //next set of path points
       let target = this.path[this.pathIndex];
