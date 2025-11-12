@@ -105,6 +105,10 @@ this.activeEnemies.push(newEnemy);
     this.activeEnemies = this.activeEnemies.filter(e => e.alive);
 
     this.frameCount++;
+
+    if (!this.waveActive && this.currentWaveIndex < this.waves.length) {
+    this.startWave();
+  }
   }
 
   draw() {
