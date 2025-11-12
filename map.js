@@ -1,15 +1,26 @@
+// sketch.js
+let bg;
 let path;
 let ui;
-let tower1;
 let enemy1;
 let enemy2;
+let uiBg;
 let info;
 let enemy2Spawned = false;
+let enemies;
+
+
+function mapPreload() {
+  bg = loadImage("assets/Wild_West_Bg.png");
+  uiBg = loadImage("assets/woodBack.png");
+  gameover = loadImage('assets/gameover.png')
+}
+
 
 function mapSetup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1400, 750);
 
-  // Create Path object instead of hardcoded array
+  // Path (polyline points)
   path = new Path([
     { x: 220, y: 440 },
     { x: 220, y: 360 },
@@ -29,45 +40,34 @@ function mapSetup() {
     { x: 1258, y: 351 },
   ]);
 
-  // Pass assets into UI so it can render background and palette with tower objects
+  // UI (drag & drop towers)
   ui = new UI(path, { bg, uiBg });
 
-  // This is our main info tracker
+  // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
-  // Existing sample tower & enemy (kept as-is; placed towers via UI are separate)
-  tower1 = new Tower(200, 325, 30, 2, 1);
-
-  // Give enemies health and currency values
-  enemy1 = new Enemy(path.points, 1, 100, 10); // 100 health, 10 currency
+    waveManager = new WaveManager(waves);
+  waveManager.startWave();
 }
 
 function mapDraw() {
-   if (info && info.isGameOver) {
-
-
-    // Draw the background one last time
+  background('white');
+  // Game Over overlay
+  if (info && info.isGameOver) {
     image(bg, 0, 0, width, height);
-    // Draw the path
     path.display();
-    // Draw towers from UI
     ui.displayGameOver();
 
-    // Draw the sample tower
-    tower1.draw();
-
-    // Darken the screen
+    // Darken screen
     push();
-    fill(0, 0, 0, 150); // Semi-transparent black
+    fill(0, 0, 0, 150);
     rect(0, 0, width, height);
     pop();
 
-    // Draw the HUD
     info.draw();
 
-    // Draw Game Over Text
     push();
-    fill(255, 0, 0); // Red
+    fill(255, 0, 0);
     textSize(80);
     textAlign(CENTER, CENTER);
     stroke(0);
@@ -78,42 +78,42 @@ function mapDraw() {
     return;
   }
 
+  // Normal game loop
 
-  // We draw the background image first
-  image(bg, 0, 0, width, height);
+  // Background
+  /* Height - 250 is to re-align menu screen */
+  image(bg, 0, 0, width, (height - 250));
 
-  ui.display(info);
+  // UI draws palette, placed towers, and updates towers against enemies
+  ui.display(info, waveManager.activeEnemies);
 
-  // Enemies
-  if (enemy1.alive) {
-    enemy1.update(info);
-    enemy1.draw();
-  }
+     waveManager.update(info);
+  waveManager.draw();
 
-  if (millis() > 2000 && !enemy2Spawned) {
-    enemy2 = new Enemy(path.points, 1, 100, 15); // 100 health, 15 currency
-    enemy2Spawned = true;
-  }
-
-  if (enemy2Spawned && enemy2.alive) {
-    enemy2.update(info);
-    enemy2.draw();
-  }
-
-  tower1.draw();
-
-  // This tower will try to attack both enemies
-  // We call tower1.update() instead of the manual distance check
-  if (enemy1.alive) {
-    tower1.update(enemy1, info);
-  }
-  if (enemy2Spawned && enemy2.alive) {
-    tower1.update(enemy2, info);
-  }
-
-  // Optional: draw the path outline for testing
+  // Optional: draw the path outline
   path.display();
 
   // HUD
   info.draw();
+}
+
+// Forward mouse events to UI so TowerDragger can do its thing
+function mouseDragged() {
+  if (ui.mouseDragged) ui.mouseDragged();
+}
+function mouseMoved() {
+  if (ui.mouseMoved) ui.mouseMoved();
+}
+function mouseReleased() {
+  ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
+}
+
+function gameOverSetup() {
+  createCanvas(700,650)
+  image(gameover, 0, 0)
+  
+
+
+  //retry brings you back to the map page
+  //quit brings you back to the start page
 }
