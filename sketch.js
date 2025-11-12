@@ -7,7 +7,7 @@ let enemy2;
 let uiBg;
 let info;
 let enemy2Spawned = false;
-let enemies = []; // central list of all enemies
+let enemies;
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
@@ -82,11 +82,11 @@ function draw() {
   image(bg, 0, 0, width, height - 250);
 
   // UI draws palette, placed towers, and updates towers against enemies
-  ui.display(info, enemies);
+  ui.display(info, waveManager.activeEnemies);
 
      waveManager.update(info);
   waveManager.draw();
-  
+
   // Optional: draw the path outline
   path.display();
 
