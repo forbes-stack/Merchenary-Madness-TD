@@ -15,7 +15,7 @@ function preload() {
 }
 
 function setup() {
-  createCanvas(windowWidth, windowHeight);
+  createCanvas(1400, 750);
 
   // Path (polyline points)
   path = new Path([
@@ -49,6 +49,7 @@ function setup() {
 }
 
 function draw() {
+  background('white');
   // Game Over overlay
   if (info && info.isGameOver) {
     image(bg, 0, 0, width, height);
@@ -78,7 +79,8 @@ function draw() {
   // Normal game loop
 
   // Background
-  image(bg, 0, 0, width, height);
+  /* Height - 250 is to re-align menu screen */
+  image(bg, 0, 0, width, height - 250);
 
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, enemies);
@@ -119,6 +121,9 @@ function mouseReleased() {
   ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
 
+// commented out to set map to a specific resolution.
+/*
 function windowResized() {
   resizeCanvas(windowWidth, windowHeight);
 }
+*/
