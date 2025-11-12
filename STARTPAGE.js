@@ -1,3 +1,19 @@
+// let retry_button,
+//     quit_button
+
+// function preload() {
+//   gameover = loadImage('assets/gameover.png')
+// }
+
+// function setup() {
+//   createCanvas(700,650)
+//   image(gameover, 0, 0)
+// }
+
+// function draw() {
+
+// }
+
 let start_button, 
     settings_button,
     settings_header,
@@ -5,12 +21,12 @@ let start_button,
     img, 
     mousePress = false, 
     settingsLoaded = false, 
-    mapLoaded = false,
+    mapLoaded = false
     
 
     //each js script for map.js
     sources = ['map.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
-               'towers/tower.js', 'towerDragger.js',
+               'towers/tower.js', 'towerDragger.js', 'waves.js',
                'path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js'
               ]
     page = 'home'; 
@@ -19,8 +35,6 @@ function preload() {
   img = loadImage('assets/start.png') 
   img2 = loadImage('assets/settings_bg.png')
   img3 = loadImage('assets/home.png')
-  bg = loadImage("assets/Wild_West_Bg.png");
-  uiBg = loadImage("assets/woodBack.png");
 } 
 
 function setup() { 
@@ -57,11 +71,16 @@ function draw() {
   
   //Actual Page Changing
 
+  // Once you hit Start/Settings, the page var will change to map/settings,
+  //leading to (Step 1), which will then call loadScript() and load the scripts
+  //corresponding to 
+
   //(Step 1)
   if (page === 'map' && !mapLoaded) { 
     mapLoaded = "loading";
     loadScript(sources, () => { 
       mapLoaded = true;
+      mapPreload();
       mapSetup(); 
     }); 
   }
