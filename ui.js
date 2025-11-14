@@ -9,6 +9,8 @@ class UI {
     // Tower templates in the palette
     this.towerTypes = [
     { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
+    { type: "gatling", range: 100, damage: 3, rate: 0.1, cost: 50 },
+    { type: "cannon", range: 150, damage: 50, rate: 1.5, cost: 75 },
     // add more types with their own cost...
     ];
 
@@ -16,6 +18,8 @@ class UI {
     // Palette tile centers
     this.paletteSlots = [
       { x: 75, y: 550, type: "basic" },
+      { x: 225, y: 550, type: "gatling" },
+      { x: 375, y: 550, type: "cannon" },
       // { x: 200, y: 550, type: "slow" },
     ];
 
@@ -50,10 +54,49 @@ class UI {
     for (let slot of this.paletteSlots) {
       const base = this.towerTypes.find(t => t.type === slot.type);
       if (!base) continue;
+
       push();
       noStroke();
-      fill(100, 100, 255); // same color as Tower.draw()
-      circle(slot.x, slot.y, 30);
+      if (slot.type === "basic") {
+        fill(100, 100, 255); // Blue circle
+        circle(slot.x, slot.y, 30);
+      } else if (slot.type === "gatling") {
+        fill(0, 150, 0); // Green circle
+        circle(slot.x, slot.y, 30);
+      } else if (slot.type === "cannon") {
+        fill(0, 0, 200); // Blue triangle
+        let r = 18;
+        triangle(
+          slot.x, slot.y - r*0.8,
+          slot.x - r, slot.y + r * 0.6,
+          slot.x + r, slot.y + r * 0.6
+        );
+      }
+      pop();
+
+      const cost = base.cost;
+      let hasEnoughGold = false;
+      // Check if info object exists and has currency
+      if (info && typeof info.currency === 'number') {
+        hasEnoughGold = info.currency >= cost;
+      }
+
+      // Costs displayed under tower tiles.
+      push();
+      textAlign(CENTER, TOP);
+      textSize(16);
+      noStroke();
+
+      // Set color based on currency
+      if (hasEnoughGold) {
+        fill(255, 223, 0); // Gold
+      } else {
+        fill(255, 0, 0); // Red
+      }
+
+      // Draw text below the icon
+      // Icon is at slot.y (550). Let's add 25px to put it below.
+      text(`$${cost}`, slot.x, slot.y + 25);
       pop();
     }
 
@@ -91,6 +134,17 @@ class UI {
       circle(slot.x, slot.y, 30);
       pop();
     }
+
+    // No info object here, so just draw cost in a neutral color
+      const cost = base.cost;
+      push();
+      textAlign(CENTER, TOP);
+      textSize(16);
+      noStroke();
+      fill(200); // Neutral grey/white
+      text(`$${cost}`, slot.x, slot.y + 25);
+      pop();
+
 
     for (let t of this.placedTowers) {
       t.draw();
