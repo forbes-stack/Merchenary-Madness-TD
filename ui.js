@@ -14,7 +14,6 @@ class UI {
     // add more types with their own cost...
     ];
 
-
     // Palette tile centers
     this.paletteSlots = [
       { x: 75, y: 550, type: "basic" },
@@ -32,11 +31,9 @@ class UI {
     this.uiBg = assets.uiBg;
   }
 
-  // Draws palette, placed towers, and updates towers with enemies
   display(info, allEnemies) {
-    // Do NOT draw the game background here; sketch.js owns that.
+    // (palette drawing unchanged)
 
-    // Palette tiles (boxes)
     const boxes = [
       [50, 525], [50, 625],
       [200, 525], [200, 625],
@@ -147,16 +144,43 @@ class UI {
 
 
     for (let t of this.placedTowers) {
+      if (allEnemies && info) {
+        t.update(allEnemies, info);
+      }
       t.draw();
     }
+
+    // --- Dragging preview (ghost tower + range) ---
+    // ORIGINAL:
+    // this.dragger.drawPreview(info, this.path);
+    // CHANGE: pass placedTowers so the preview can flag overlap in red
+    this.dragger.drawPreview(info, this.path, this.placedTowers);
   }
 
-  // Mouse events forwarded from sketch.js
+  displayGameOver() {
+    // (unchanged visual-only drawing)
+
+    const boxes = [
+      [50, 525], [50, 625], [200, 525], [200, 625],
+      [350, 525], [350, 625], [500, 525], [500, 625],
+      [650, 525], [650, 625], [800, 525], [800, 625],
+      [950, 525], [950, 625]
+    ];
+    for (let [x, y] of boxes) rect(x, y, 50, 50);
+
+    for (let slot of this.paletteSlots) {
+      const base = this.towerTypes.find(t => t.type === slot.type);
+      if (!base) continue;
+      push(); noStroke(); fill(100, 100, 255); circle(slot.x, slot.y, 30); pop();
+    }
+
+    for (let t of this.placedTowers) t.draw();
+  }
+
   mousePressed() {
-    // Start dragging when clicking a palette icon
     for (let slot of this.paletteSlots) {
       const d = dist(mouseX, mouseY, slot.x, slot.y);
-      if (d < 30 / 2 + 10) { // small hitbox padding
+      if (d < 30 / 2 + 10) {
         this.dragger.startDrag(slot.type, mouseX, mouseY);
         break;
       }
@@ -172,7 +196,6 @@ class UI {
   }
 
   mouseReleased(infoTracker) {
-  this.dragger.endDrag(this.path, this.placedTowers, infoTracker);
+    this.dragger.endDrag(this.path, this.placedTowers, infoTracker);
   }
-
 }
