@@ -8,10 +8,12 @@ let uiBg;
 let info;
 let enemy2Spawned = false;
 let enemies;
+let longBg;
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
   uiBg = loadImage("assets/woodBack.png");
+  longBg = loadImage("assets/dusty2.jpg")
 }
 
 function setup() {
@@ -80,7 +82,7 @@ function draw() {
   // Background
   /* Height - 250 is to re-align menu screen */
   image(bg, 0, 0, width, height - 250);
-
+image(longBg, 0, height - 250, width, 250);
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, waveManager.activeEnemies);
 
