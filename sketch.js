@@ -6,8 +6,7 @@ let enemy1;
 let enemy2;
 let uiBg;
 let info;
-let enemy2Spawned = false;
-let enemies;
+let waveManager;
 let longBg;
 
 function preload() {
