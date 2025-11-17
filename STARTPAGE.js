@@ -25,9 +25,10 @@ let start_button,
     
 
     //each js script for map.js
-    sources = ['map.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
+    sources = ['map.js', 'waveGenerator.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
                'towers/tower.js', 'towerDragger.js', 'waves.js',
-               'path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js'
+               'path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
+               'towers/gatlingTower.js', 'towers/cannonTower.js',
               ]
     page = 'home'; 
 
@@ -44,14 +45,14 @@ function setup() {
   start_button = createButton("Start"); 
   
   start_button.size(300, 100); 
-  start_button.position(220, 300); 
+  start_button.position(CENTER, 350); 
   styleButton(start_button)
   
   
   settings_button = createButton("Settings"); 
   
   settings_button.size(300, 100); 
-  settings_button.position(220, 450) 
+  settings_button.position(CENTER, 500) 
   styleButton(settings_button)
   
 } 

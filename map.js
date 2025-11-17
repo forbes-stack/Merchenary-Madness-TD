@@ -14,6 +14,7 @@ function mapPreload() {
   bg = loadImage("assets/Wild_West_Bg.png");
   uiBg = loadImage("assets/woodBack.png");
   gameover = loadImage('assets/gameover.png')
+  longBg = loadImage("assets/dusty2.jpg")
 }
 
 
@@ -46,8 +47,8 @@ function mapSetup() {
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
-    waveManager = new WaveManager(waves);
-  waveManager.startWave();
+  waveManager = new WaveManager(path);
+  waveManager.startWave(info);
 }
 
 function mapDraw() {
@@ -82,12 +83,12 @@ function mapDraw() {
 
   // Background
   /* Height - 250 is to re-align menu screen */
-  image(bg, 0, 0, width, (height - 250));
-
+  image(bg, 0, 0, width, height - 250);
+  image(longBg, 0, height - 250, width, 250);
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, waveManager.activeEnemies);
 
-     waveManager.update(info);
+  waveManager.update(info);
   waveManager.draw();
 
   // Optional: draw the path outline
