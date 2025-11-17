@@ -6,8 +6,7 @@ class Path {
     display(tolerance = 25) {
         // Draw the path lines
         push();
-        stroke(255, 255, 0);
-        strokeWeight(4);
+        strokeWeight(0);
         noFill();
         beginShape();
         for (let p of this.points) vertex(p.x, p.y);
@@ -16,8 +15,6 @@ class Path {
 
         // Draw the tolerance area visually (for debugging)
         push();
-        stroke(255, 0, 0, 80);
-        strokeWeight(tolerance * 2); // thicker visual zone
         noFill();
         beginShape();
         for (let p of this.points) vertex(p.x, p.y);

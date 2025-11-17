@@ -53,7 +53,6 @@ function draw() {
   // Game Over overlay
   if (info && info.isGameOver) {
     image(bg, 0, 0, width, height);
-    path.display();
     ui.displayGameOver();
 
     // Darken screen
@@ -89,7 +88,6 @@ image(longBg, 0, height - 250, width, 250);
   waveManager.draw();
 
   // Optional: draw the path outline
-  path.display();
 
   // HUD
   info.draw();
