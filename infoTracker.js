@@ -8,7 +8,7 @@ class InfoTracker {
   constructor(startHealth, startRound) {
     this.maxHealth = startHealth;
     this.health = startHealth;
-    this.currency = 50;
+    this.currency = 75;
     this.round = startRound;
     this.isGameOver = false;
   }
