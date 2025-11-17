@@ -1,7 +1,7 @@
 class tankEnemy extends Enemy{
 
     constructor(path){
-        super(path, .5, 300, 15)
+        super(path, .5, 500, 15)
     }
 
 draw(){

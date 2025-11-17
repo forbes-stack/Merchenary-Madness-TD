@@ -23,14 +23,23 @@ class WaveManager {
 
 
     // 1. Basic enemies: Always spawn, more over time.
-    let basicCount = 10 + (roundNumber * 2);
+    let basicCount;
+    if (roundNumber < 5) {
+      basicCount = 5 + (roundNumber * 4);
+    }
+    if (roundNumber >= 5 && roundNumber < 10) {
+      basicCount = 5 * (roundNumber * 5);
+    }
+    if (roundNumber > 10) {
+      basicCount = 5 * (roundNumber * 10);
+    }
     for (let i = 0; i < basicCount; i++) {
       waveEnemies.push('basicEnemy');
     }
 
     // 2. Tank enemies: Start spawning at round 3.
     if (roundNumber >= 3) {
-      let tankCount = 5 + (roundNumber - 3);
+      let tankCount = 5 * (roundNumber - 3);
       for (let i = 0; i < tankCount; i++) {
         waveEnemies.push('tankEnemy');
       }
@@ -38,7 +47,7 @@ class WaveManager {
 
     // 3. Fast enemies: Start spawning at round 5.
     if (roundNumber >= 5) {
-      let fastCount = 10 + (roundNumber - 5);
+      let fastCount = 10 * (roundNumber - 5);
       for (let i = 0; i < fastCount; i++) {
         waveEnemies.push('fastEnemy');
       }

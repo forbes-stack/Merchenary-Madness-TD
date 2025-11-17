@@ -28,6 +28,11 @@ class InfoTracker {
     }
   }
 
+  // method to update the round number
+  setRound(newRound) {
+      this.round = newRound;
+  }
+
   // attempt to spend currency; returns true if success
   decreaseCurrency(amount) {
     if (typeof amount !== "number" || amount <= 0) return false;
