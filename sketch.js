@@ -8,6 +8,7 @@ let uiBg;
 let info;
 let waveManager;
 let longBg;
+let startWaveButton;
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
@@ -44,13 +45,20 @@ function setup() {
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
+  createStartWaveButton();
+
   waveManager = new WaveManager(path);
   waveManager.startWave(info);
 }
 
 function draw() {
   background('white');
-  // Game Over overlay
+  
+
+  if (waveManager.waitingForPlayer) startWaveButton.show();
+else startWaveButton.hide();
+
+// Game Over overlay
   if (info && info.isGameOver) {
     image(bg, 0, 0, width, height);
     ui.displayGameOver();
@@ -107,9 +115,24 @@ function mouseReleased() {
   ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
 
-// commented out to set map to a specific resolution.
-/*
-function windowResized() {
-  resizeCanvas(windowWidth, windowHeight);
+function createStartWaveButton() {
+  startWaveButton = createButton("Start Wave");
+
+  // Position in top-right of canvas
+  startWaveButton.position(width - 130, 40);
+  startWaveButton.size(110, 40);
+
+  // Styling
+  startWaveButton.style("font-size", "16px");
+  startWaveButton.style("background-color", "#c97a2b");
+  startWaveButton.style("color", "white");
+  startWaveButton.style("border", "2px solid #603814");
+  startWaveButton.style("border-radius", "8px");
+  startWaveButton.style("cursor", "pointer");
+
+  // Hook it up to WaveManager
+  startWaveButton.mousePressed(() => {
+    waveManager.startNextWave(info);
+  });
 }
-*/
+

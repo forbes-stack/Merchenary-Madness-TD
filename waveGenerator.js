@@ -12,6 +12,8 @@ class WaveManager {
     this.spawning = false;
     this.spawnTimer = 0; // Frames between spawns
     this.spawnInterval = 30; // Spawn a new enemy every 0.5 seconds (30 frames)
+
+    this.waitingForPlayer = false;
   }
 
   /**
@@ -85,6 +87,10 @@ class WaveManager {
       return;
     }
 
+      if (this.waitingForPlayer) {
+    return;
+  }
+
     // 1. Update all active enemies
     for (let i = this.activeEnemies.length - 1; i >= 0; i--) {
       let enemy = this.activeEnemies[i];
@@ -132,6 +138,8 @@ class WaveManager {
       }
     }
 
+
+
     // 3. Check for End-of-Wave
     // If we are NOT spawning, and there are NO active enemies, the round is over.
     if (!this.spawning && this.activeEnemies.length === 0 && this.spawnQueue.length === 0) {
@@ -139,10 +147,19 @@ class WaveManager {
       // Tell infoTracker to advance the round (gives money, increments round)
       infoTracker.nextRound();
 
-      // Immediately start the next wave! This creates the endless loop.
-      this.startWave(infoTracker);
+      this.waitingForPlayer = true;
+
+      return;
     }
   }
+
+startNextWave(infoTracker) {
+  if (this.waitingForPlayer) {
+    this.waitingForPlayer = false;
+    this.startWave(infoTracker);
+  }
+}
+
 
   /**
    * Main draw loop. Called every frame by sketch.js.
