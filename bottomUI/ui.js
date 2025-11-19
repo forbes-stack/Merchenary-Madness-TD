@@ -29,6 +29,7 @@ class UI {
 
     this.bg = assets.bg;   // optional, not drawn here
     this.uiBg = assets.uiBg;
+    this.gattlingIcon = assets.gattlingIcon;
 
     //Upgrade UI
      this.selectedTower = null;
@@ -139,7 +140,9 @@ class UI {
         circle(slot.x, slot.y, 30);
       } else if (slot.type === "gatling") {
         fill(0, 150, 0); // Green circle
-        circle(slot.x, slot.y, 30);
+imageMode(CENTER);
+image(this.gattlingIcon, slot.x, slot.y, 50, 50);
+        // circle(slot.x, slot.y, 30); edited out for now
       } else if (slot.type === "cannon") {
         fill(0, 0, 200); // Blue triangle
         let r = 18;
