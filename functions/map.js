@@ -1,4 +1,4 @@
-// sketch.js
+// map.js
 let bg;
 let path;
 let ui;
@@ -6,8 +6,9 @@ let enemy1;
 let enemy2;
 let uiBg;
 let info;
-let enemy2Spawned = false;
-let enemies;
+let waveManager;
+let longBg;
+let startWaveButton;
 
 
 function mapPreload() {
@@ -47,16 +48,22 @@ function mapSetup() {
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
 
+  createStartWaveButton();
+
   waveManager = new WaveManager(path);
   waveManager.startWave(info);
 }
 
 function mapDraw() {
   background('white');
-  // Game Over overlay
+
+
+  if (waveManager.waitingForPlayer) startWaveButton.show();
+else startWaveButton.hide();
+
+// Game Over overlay
   if (info && info.isGameOver) {
     image(bg, 0, 0, width, height);
-    path.display();
     ui.displayGameOver();
 
     // Darken screen
@@ -78,13 +85,12 @@ function mapDraw() {
 
     return;
   }
-
-  // Normal game loop
+ // Normal game loop
 
   // Background
   /* Height - 250 is to re-align menu screen */
   image(bg, 0, 0, width, height - 250);
-  image(longBg, 0, height - 250, width, 250);
+image(longBg, 0, height - 250, width, 250);
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, waveManager.activeEnemies);
 
@@ -92,13 +98,15 @@ function mapDraw() {
   waveManager.draw();
 
   // Optional: draw the path outline
-  path.display();
 
   // HUD
   info.draw();
 }
 
 // Forward mouse events to UI so TowerDragger can do its thing
+function mousePressed() {
+  ui.mousePressed();
+}
 function mouseDragged() {
   if (ui.mouseDragged) ui.mouseDragged();
 }
@@ -109,12 +117,23 @@ function mouseReleased() {
   ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
 
-function gameOverSetup() {
-  createCanvas(700,650)
-  image(gameover, 0, 0)
-  
+function createStartWaveButton() {
+  startWaveButton = createButton("Start Wave");
 
+  // Position in top-right of canvas
+  startWaveButton.position(width - 130, 40);
+  startWaveButton.size(110, 40);
 
-  //retry brings you back to the map page
-  //quit brings you back to the start page
+  // Styling
+  startWaveButton.style("font-size", "16px");
+  startWaveButton.style("background-color", "#c97a2b");
+  startWaveButton.style("color", "white");
+  startWaveButton.style("border", "2px solid #603814");
+  startWaveButton.style("border-radius", "8px");
+  startWaveButton.style("cursor", "pointer");
+
+  // Hook it up to WaveManager
+  startWaveButton.mousePressed(() => {
+  waveManager.startNextWave(info);
+  });
 }

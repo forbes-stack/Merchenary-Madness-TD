@@ -25,9 +25,9 @@ let start_button,
     
 
     //each js script for map.js
-    sources = ['map.js', 'waveGenerator.js', 'enemies/enemy.js', 'ui.js', 'infoTracker.js',
-               'towers/tower.js', 'towerDragger.js', 'waves.js',
-               'path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
+    sources = ['functions/map.js', 'functions/waveGenerator.js', 'enemies/enemy.js', 'bottomUI/ui.js', 'bottomUI/infoTracker.js',
+               'towers/tower.js', 'functions/towerDragger.js',
+               'functions/path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
                'towers/gatlingTower.js', 'towers/cannonTower.js',
               ]
     page = 'home'; 
@@ -88,7 +88,7 @@ function draw() {
   
   //(Step 1)
   if (page === 'settings' && !settingsLoaded) { 
-    loadScript(['settings.js'], () => { 
+    loadScript(['pages/settings.js'], () => { 
       settingsLoaded = true;
       
     }); 
