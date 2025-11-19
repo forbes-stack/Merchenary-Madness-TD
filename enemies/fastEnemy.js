@@ -1,6 +1,6 @@
 class fastEnemy extends Enemy{
     constructor(path){
-        super(path, 3, 25, 10)
+        super(path, 3, 25, 1)
     }
 
 // NEW: Only draws the unique body shape

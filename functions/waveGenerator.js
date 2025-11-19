@@ -11,9 +11,8 @@ class WaveManager {
     this.spawnQueue = []; // Enemies waiting to spawn this wave
     this.spawning = false;
     this.spawnTimer = 0; // Frames between spawns
-    this.spawnInterval = 30; // Spawn a new enemy every 0.5 seconds (30 frames)
-
-    this.waitingForPlayer = false;
+    this.initialSpawnInterval = 60; // Start at 1 second (60 frames)
+    this.spawnInterval = this.initialSpawnInterval; // Current interval, will decrease
   }
 
   /**
@@ -23,33 +22,58 @@ class WaveManager {
   generateWave(roundNumber) {
     let waveEnemies = [];
 
+    // --- 1. Adjust Spawn Interval (Difficulty Scaling) ---
+    // Decrease the interval (faster spawn) as the round number increases.
+    // Decrease by 3 per round, capping at a minimum of 10 frames (0.16 seconds).
+    let reduction = Math.min((roundNumber - 1) * 3, this.initialSpawnInterval - 10);
+    this.spawnInterval = this.initialSpawnInterval - reduction;
+    this.spawnInterval = Math.max(this.spawnInterval, 10); // Don't go below 10 frames (0.16s)
 
-    // 1. Basic enemies: Always spawn, more over time.
+    console.log(`Round ${roundNumber}: Spawn Interval set to ${this.spawnInterval} frames.`);
+
+    // --- 2. Enemy Count Scaling (Easy for rounds 1-5, then harder) ---
+
+    // Basic enemies: Always spawn, moderate growth.
     let basicCount;
-    if (roundNumber < 5) {
-      basicCount = 5 + (roundNumber * 4);
-    }
-    if (roundNumber >= 5 && roundNumber < 10) {
-      basicCount = 5 * (roundNumber * 5);
-    }
-    if (roundNumber > 10) {
-      basicCount = 5 * (roundNumber * 10);
+    if (roundNumber <= 5) {
+      // Easy rounds 1-5: Linear, slow growth (R1=5, R5=17)
+      basicCount = 5 + ((roundNumber - 1) * 3);
+    } else {
+      // Harder rounds 6+: Faster linear growth
+      // Starts at 17 + 10 = 27 for R6
+      basicCount = 17 + ((roundNumber - 5) * 10);
     }
     for (let i = 0; i < basicCount; i++) {
       waveEnemies.push('basicEnemy');
     }
 
-    // 2. Tank enemies: Start spawning at round 3.
+    // Tank enemies: Start spawning at round 3.
     if (roundNumber >= 3) {
-      let tankCount = 5 * (roundNumber - 3);
+      let tankCount;
+      if (roundNumber <= 5) {
+        // Easy rounds 3-5: Slow growth (R3=1, R5=3)
+        tankCount = roundNumber - 2;
+      } else {
+        // Harder rounds 6+: Faster exponential growth
+        // Starts at 3 + 1 = 4 for R6
+        tankCount = 3 + Math.floor(Math.pow(1.5, roundNumber - 5));
+      }
       for (let i = 0; i < tankCount; i++) {
         waveEnemies.push('tankEnemy');
       }
     }
 
-    // 3. Fast enemies: Start spawning at round 5.
+    // Fast enemies: Start spawning at round 5.
     if (roundNumber >= 5) {
-      let fastCount = 10 * (roundNumber - 5);
+      let fastCount;
+      if (roundNumber == 5) {
+        // Round 5: Small introduction (5)
+        fastCount = 5;
+      } else {
+        // Harder rounds 6+: Rapid growth
+        // Starts at 5 + 15 = 20 for R6
+        fastCount = 5 + ((roundNumber - 5) * 15);
+      }
       for (let i = 0; i < fastCount; i++) {
         waveEnemies.push('fastEnemy');
       }
@@ -86,10 +110,6 @@ class WaveManager {
       this.spawnQueue = [];
       return;
     }
-
-      if (this.waitingForPlayer) {
-    return;
-  }
 
     // 1. Update all active enemies
     for (let i = this.activeEnemies.length - 1; i >= 0; i--) {
@@ -135,31 +155,18 @@ class WaveManager {
       // If spawn queue is empty, we are done spawning this wave
       if (this.spawnQueue.length === 0) {
         this.spawning = false;
+        this.waitingForPlayer = true;
+        infoTracker.nextRound();
       }
     }
+  }
 
-
-
-    // 3. Check for End-of-Wave
-    // If we are NOT spawning, and there are NO active enemies, the round is over.
-    if (!this.spawning && this.activeEnemies.length === 0 && this.spawnQueue.length === 0) {
-
-      // Tell infoTracker to advance the round (gives money, increments round)
-      infoTracker.nextRound();
-
-      this.waitingForPlayer = true;
-
-      return;
+  startNextWave(infoTracker) {
+    if (this.waitingForPlayer) {
+      this.waitingForPlayer = false;
+      this.startWave(infoTracker);
     }
   }
-
-startNextWave(infoTracker) {
-  if (this.waitingForPlayer) {
-    this.waitingForPlayer = false;
-    this.startWave(infoTracker);
-  }
-}
-
 
   /**
    * Main draw loop. Called every frame by sketch.js.

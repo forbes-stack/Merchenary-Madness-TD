@@ -1,7 +1,7 @@
 class tankEnemy extends Enemy{
 
     constructor(path){
-        super(path, .5, 500, 15)
+        super(path, .5, 500, 5)
     }
 
 // NEW: Only draws the unique body shape

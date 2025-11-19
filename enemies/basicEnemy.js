@@ -1,7 +1,7 @@
 class basicEnemy extends Enemy{
 
 constructor(path){
-    super(path, 1, 100, 10)
+    super(path, 1, 100, 1)
 }
 
 // NEW: Only draws the unique body shape

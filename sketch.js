@@ -53,7 +53,7 @@ function setup() {
 
 function draw() {
   background('white');
-  
+
 
   if (waveManager.waitingForPlayer) startWaveButton.show();
 else startWaveButton.hide();
@@ -132,7 +132,6 @@ function createStartWaveButton() {
 
   // Hook it up to WaveManager
   startWaveButton.mousePressed(() => {
-    waveManager.startNextWave(info);
+  waveManager.startNextWave(info);
   });
 }
-
