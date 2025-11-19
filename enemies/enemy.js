@@ -1,4 +1,4 @@
-
+// enemy.js
 // General enemy object
 class Enemy {
   constructor(path, speed, health, currency) {
@@ -47,12 +47,18 @@ if(!this.alive) return;
     }
   }
 
+  // NEW: This is the method that subclasses must override to draw their unique shape.
+  drawBody() {
+      // Placeholder method
+  }
+
+  // The main draw method. Subclasses call super.draw() to get the health bar.
   draw() {
     if (!this.alive) return;
 
-    this.drawBody();
+    this.drawBody(); // Draw the unique shape (implemented by subclass)
 
-    // Health bar background
+    // Health bar background (Now centralized in the base class)
     push();
     fill(0);
     rect(this.x - 10, this.y - 15, 20, 5);
@@ -76,4 +82,4 @@ takeDamage(amount, infoTracker) {
     infoTracker.addCurrency(this.currency); // kill reward for enemy
   }
 }
-  }
+}
