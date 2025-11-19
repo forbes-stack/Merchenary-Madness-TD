@@ -11,14 +11,9 @@ class WaveManager {
     this.spawnQueue = []; // Enemies waiting to spawn this wave
     this.spawning = false;
     this.spawnTimer = 0; // Frames between spawns
-<<<<<<< Updated upstream
     this.spawnInterval = 30; // Spawn a new enemy every 0.5 seconds (30 frames)
 
     this.waitingForPlayer = false;
-=======
-    this.initialSpawnInterval = 60; // Start at 1 second (60 frames)
-    this.spawnInterval = this.initialSpawnInterval; // Current interval, will decrease
->>>>>>> Stashed changes
   }
 
   /**
@@ -28,58 +23,33 @@ class WaveManager {
   generateWave(roundNumber) {
     let waveEnemies = [];
 
-    // --- 1. Adjust Spawn Interval (Difficulty Scaling) ---
-    // Decrease the interval (faster spawn) as the round number increases.
-    // Decrease by 3 per round, capping at a minimum of 10 frames (0.16 seconds).
-    let reduction = Math.min((roundNumber - 1) * 3, this.initialSpawnInterval - 10);
-    this.spawnInterval = this.initialSpawnInterval - reduction;
-    this.spawnInterval = Math.max(this.spawnInterval, 10); // Don't go below 10 frames (0.16s)
 
-    console.log(`Round ${roundNumber}: Spawn Interval set to ${this.spawnInterval} frames.`);
-
-    // --- 2. Enemy Count Scaling (Easy for rounds 1-5, then harder) ---
-
-    // Basic enemies: Always spawn, moderate growth.
+    // 1. Basic enemies: Always spawn, more over time.
     let basicCount;
-    if (roundNumber <= 5) {
-      // Easy rounds 1-5: Linear, slow growth (R1=5, R5=17)
-      basicCount = 5 + ((roundNumber - 1) * 3);
-    } else {
-      // Harder rounds 6+: Faster linear growth
-      // Starts at 17 + 10 = 27 for R6
-      basicCount = 17 + ((roundNumber - 5) * 10);
+    if (roundNumber < 5) {
+      basicCount = 5 + (roundNumber * 4);
+    }
+    if (roundNumber >= 5 && roundNumber < 10) {
+      basicCount = 5 * (roundNumber * 5);
+    }
+    if (roundNumber > 10) {
+      basicCount = 5 * (roundNumber * 10);
     }
     for (let i = 0; i < basicCount; i++) {
       waveEnemies.push('basicEnemy');
     }
 
-    // Tank enemies: Start spawning at round 3.
+    // 2. Tank enemies: Start spawning at round 3.
     if (roundNumber >= 3) {
-      let tankCount;
-      if (roundNumber <= 5) {
-        // Easy rounds 3-5: Slow growth (R3=1, R5=3)
-        tankCount = roundNumber - 2;
-      } else {
-        // Harder rounds 6+: Faster exponential growth
-        // Starts at 3 + 1 = 4 for R6
-        tankCount = 3 + Math.floor(Math.pow(1.5, roundNumber - 5));
-      }
+      let tankCount = 5 * (roundNumber - 3);
       for (let i = 0; i < tankCount; i++) {
         waveEnemies.push('tankEnemy');
       }
     }
 
-    // Fast enemies: Start spawning at round 5.
+    // 3. Fast enemies: Start spawning at round 5.
     if (roundNumber >= 5) {
-      let fastCount;
-      if (roundNumber == 5) {
-        // Round 5: Small introduction (5)
-        fastCount = 5;
-      } else {
-        // Harder rounds 6+: Rapid growth
-        // Starts at 5 + 15 = 20 for R6
-        fastCount = 5 + ((roundNumber - 5) * 15);
-      }
+      let fastCount = 10 * (roundNumber - 5);
       for (let i = 0; i < fastCount; i++) {
         waveEnemies.push('fastEnemy');
       }
