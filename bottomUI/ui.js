@@ -30,6 +30,7 @@ class UI {
     this.bg = assets.bg;   // optional, not drawn here
     this.uiBg = assets.uiBg;
     this.gattlingIcon = assets.gattlingIcon;
+    this.cowboyIcon = assets.cowboyIcon;
 
     //Upgrade UI
      this.selectedTower = null;
@@ -137,7 +138,8 @@ class UI {
       noStroke();
       if (slot.type === "basic") {
         fill(100, 100, 255); // Blue circle
-        circle(slot.x, slot.y, 30);
+        imageMode(CENTER);
+image(this.cowboyIcon, slot.x, slot.y, 50, 50);
       } else if (slot.type === "gatling") {
         fill(0, 150, 0); // Green circle
 imageMode(CENTER);
