@@ -24,6 +24,8 @@ class TowerDragger {
       towerInstance = new GatlingGunTower(startX, startY);
     } else if (towerType === "cannon") {
       towerInstance = new CannonTower(startX, startY);
+    } else if (towerType === "sniper") {
+      towerInstance = new SniperTower(startX, startY);
     } else {
       // Fallback just in case
       towerInstance = new Tower(startX, startY, base.range, base.damage, base.rate);
@@ -154,17 +156,29 @@ class TowerDragger {
     fill(bodyColor);
 
     // Draw correct shape based on type
-    if (this.draggingTowerType === "cannon") {
-      let r = 18;
-      triangle(
-        t.x, t.y - r,
-        t.x - r, t.y + r * 0.5,
-        t.x + r, t.y + r * 0.5
-      );
-    } else {
-      // Gatling and Basic are both circles
-      circle(t.x, t.y, 30);
-    }
+if (this.draggingTowerType === "cannon") {
+  let r = 18;
+  triangle(
+    t.x, t.y - r,
+    t.x - r, t.y + r * 0.5,
+    t.x + r, t.y + r * 0.5
+  );
+
+} else if (this.draggingTowerType === "sniper") {
+  // Diamond shape (same as sniper tower)
+  const r = 15;
+  beginShape();
+  vertex(t.x,       t.y - r);
+  vertex(t.x - r,   t.y);
+  vertex(t.x,       t.y + r);
+  vertex(t.x + r,   t.y);
+  endShape(CLOSE);
+
+} else {
+  // Gatling + Basic are circles
+  circle(t.x, t.y, 30);
+}
+
 
     pop();
 

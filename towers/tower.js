@@ -31,44 +31,72 @@ class Tower {
 
   // Reusable tracer (call this at the start of draw() in subclasses)
   _drawShotTracer() {
-    if (this._shotTimer > 0 && this._lastTargetRef && this._lastTargetRef.alive) {
-      const s = this._beamStyle();
-      const trg = this._lastTargetRef;
-      push();
-      stroke(...s.stroke);
-      strokeWeight(s.strokeWeight);
-      line(this.x, this.y, trg.x, trg.y);
-      noStroke();
-      fill(...s.impact);
-      circle(trg.x, trg.y, s.impactSize);
-      pop();
-    }
     if (this._shotTimer > 0) {
-      this._shotTimer--;
-      if (this._shotTimer <= 0) this._lastTargetRef = null;
-    }
+    const style = this._beamStyle();
+
+    push();
+    strokeWeight(style.strokeWeight);
+    stroke(...style.stroke);
+
+    line(this.x, this.y, this._lastShotX, this._lastShotY);
+
+    // impact flash
+    fill(...style.impact);
+    noStroke();
+    circle(this._lastShotX, this._lastShotY, style.impactSize);
+
+    pop();
+
+    this._shotTimer--;
+  }
   }
 
   update(enemies, infoTracker) {
-    if (!enemies || enemies.length === 0) return;
-    if (this.cooldown > 0) { this.cooldown--; return; }
+if (!enemies || enemies.length === 0) return;
+if (this.cooldown > 0) { this.cooldown--; return; }
 
-    // closest-in-range (current behavior)
-    let target = null, closestDist = Infinity;
-    for (let enemy of enemies) {
-      if (!enemy || !enemy.alive) continue;
-      const d = dist(this.x, this.y, enemy.x, enemy.y);
-      if (d <= this.range && d < closestDist) { closestDist = d; target = enemy; }
-    }
+let target = null;
+let maxProgress = -Infinity;
 
-    if (target) {
-      target.takeDamage(this.damage, infoTracker);
-      this.cooldown = Math.ceil(this.rate * 60);
+for (let enemy of enemies) {
+  if (!enemy || !enemy.alive) continue;
 
-      // start tracer
-      this._lastTargetRef = target;
-      this._shotTimer = this._shotDuration;
-    }
+  const d = dist(this.x, this.y, enemy.x, enemy.y);
+  if (d > this.range) continue; // skip out-of-range enemies
+
+  // Compute progress along path (index + fraction along segment)
+  const idx = enemy.pathIndex - 1; // previous waypoint
+  if (idx < 0 || idx >= enemy.path.length - 1) continue;
+
+  const prev = enemy.path[idx];
+  const next = enemy.path[idx + 1];
+
+  const dx = next.x - prev.x;
+  const dy = next.y - prev.y;
+  const segmentLength = Math.hypot(dx, dy);
+  if (segmentLength === 0) continue;
+
+  const dxEnemy = enemy.x - prev.x;
+  const dyEnemy = enemy.y - prev.y;
+  const segmentProgress = Math.hypot(dxEnemy, dyEnemy) / segmentLength;
+
+  const progress = idx + segmentProgress;
+
+  if (progress > maxProgress) {
+    maxProgress = progress;
+    target = enemy;
+  }
+}
+
+if (target) {
+  target.takeDamage(this.damage, infoTracker);
+  this.cooldown = Math.ceil(this.rate * 60);
+
+// store snapshot position so tracer works even if the enemy dies
+this._lastShotX = target.x;
+this._lastShotY = target.y;
+this._shotTimer = this._shotDuration;
+}
   }
 
   draw() {

@@ -8,9 +8,11 @@ class UI {
 
     // Tower templates in the palette
     this.towerTypes = [
-      { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
-      { type: "gatling", range: 100, damage: 3, rate: 0.1, cost: 75 },
-      { type: "cannon", range: 150, damage: 50, rate: 1.5, cost: 125 },
+    { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
+    { type: "gatling", range: 100, damage: 3, rate: 0.1, cost: 75 },
+    { type: "cannon", range: 150, damage: 50, rate: 1.5, cost: 125 },
+    {type: "sniper", range: 20, damage: 75, rate: 1.5, cost: 100},
+    // add more types with their own cost...
     ];
 
     // Palette tile centers
@@ -18,6 +20,8 @@ class UI {
       { x: 75, y: 550, type: "basic" },
       { x: 225, y: 550, type: "gatling" },
       { x: 375, y: 550, type: "cannon" },
+      { x: 525, y: 550, type: "sniper"}
+      // { x: 200, y: 550, type: "slow" },
     ];
 
     this.placedTowers = [];
@@ -155,6 +159,22 @@ class UI {
         fill(0, 0, 200);
         let r = 18;
         triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
+      } else if (slot.type === "sniper") {
+        push();
+  fill(255, 200, 0);
+  noStroke();
+
+  // scaled-down diamond (about 60% size)
+  const r = 20;
+
+  beginShape();
+  vertex(slot.x,       slot.y - r);
+  vertex(slot.x - r,   slot.y);
+  vertex(slot.x,       slot.y + r);
+  vertex(slot.x + r,   slot.y);
+  endShape(CLOSE);
+
+  pop();
       }
       pop();
 
