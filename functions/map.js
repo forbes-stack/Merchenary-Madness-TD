@@ -11,6 +11,7 @@ let startWaveButton;
 let gattlingIcon;
 let cowboyIcon;
 let cannonIcon;
+let sniperIcon;
 
 
 function mapPreload() {
@@ -20,6 +21,7 @@ function mapPreload() {
   gattlingIcon = loadImage("assets/gattlingIcon.png");
   cowboyIcon = loadImage("assets/Cowboy_Icon.png")
   cannonIcon = loadImage("assets/cannonIcon.png")
+  sniperIcon = loadImage("assets/sniperIcon.png");
 }
 
 
@@ -47,7 +49,7 @@ createCanvas(1400, 750);
   ]);
 
   // UI (drag & drop towers)
-  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon});
+  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon, sniperIcon});
 
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
