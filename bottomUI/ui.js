@@ -10,8 +10,8 @@ class UI {
     this.towerTypes = [
       { type: "basic",   range: 120, damage: 10, rate: 0.5, cost: 25 },
       { type: "gatling", range: 100, damage: 3,  rate: 0.1, cost: 75 },
-      { type: "cannon",  range: 150, damage: 50, rate: 1.5, cost: 125 },
-      { type: "sniper",  range: 20,  damage: 75, rate: 1.5, cost: 100 },
+      { type: "cannon",  range: 150, damage: 50, rate: 1.25, cost: 100 },
+      { type: "sniper",  range: 20,  damage: 75, rate: 1.5, cost: 150 },
       // add more types with their own cost...
     ];
 

@@ -6,6 +6,7 @@ class InfoTracker {
    */
   constructor(startHealth, startRound) {
     this.maxHealth = startHealth;
+    this.startRound = startRound;   // remember the initial starting round (e.g., 1)
     this.health = startHealth;
     this.currency = 100;
     this.round = startRound;
@@ -14,12 +15,12 @@ class InfoTracker {
 
   /**
    * Reset all tracked values for a new game.
-   * Sets round back to 0, restores health and starting currency.
+   * Restores health, starting currency, and starting round.
    */
   reset() {
     this.health = this.maxHealth;
     this.currency = 100;
-    this.round = 0;        // restart to round 0
+    this.round = this.startRound;   // 🔧 was 0 before; this caused weird behavior with WaveManager
     this.isGameOver = false;
   }
 

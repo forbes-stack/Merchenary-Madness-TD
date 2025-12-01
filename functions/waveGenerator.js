@@ -164,8 +164,8 @@ class WaveManager {
   startNextWave(infoTracker) {
     if (this.waitingForPlayer) {
       this.waitingForPlayer = false;
-      this.startWave(infoTracker);
-      infoTracker.nextRound();
+    infoTracker.nextRound();       // increment first
+    this.startWave(infoTracker);   // then generate wave for new round
     }
   }
 

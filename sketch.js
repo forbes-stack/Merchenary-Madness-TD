@@ -147,7 +147,8 @@ function createStartWaveButton() {
 }
 
 /**
- * Restart the game back to "round 0" and clear towers/enemies.
+ * Restart the game back to the original starting round
+ * and clear towers/enemies.
  */
 function restartGame() {
   // Reset tracked info (health, gold, round, isGameOver)
