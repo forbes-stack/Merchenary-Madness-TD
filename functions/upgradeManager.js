@@ -16,7 +16,8 @@ const createDamagePath = () => [
     this.upgrades = {
       'gatling': { damage: createDamagePath(), rate: createRatePath() },
       'cannon':  { damage: createDamagePath(), rate: createRatePath() },
-      'basic':   { damage: createDamagePath(), rate: createRatePath() }
+      'basic':   { damage: createDamagePath(), rate: createRatePath() },
+      'sniper':  { damage: createDamagePath(), rate: createRatePath() }
     };
   }
 
