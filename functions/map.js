@@ -1,4 +1,3 @@
-// map.js
 let bg;
 let path;
 let ui;
@@ -9,18 +8,23 @@ let info;
 let waveManager;
 let longBg;
 let startWaveButton;
+let gattlingIcon;
+let cowboyIcon;
+let cannonIcon;
 
 
 function mapPreload() {
   bg = loadImage("assets/Wild_West_Bg.png");
   uiBg = loadImage("assets/woodBack.png");
-  gameover = loadImage('assets/gameover.png')
-  longBg = loadImage("assets/dusty2.jpg")
+  longBg = loadImage("assets/dusty2.jpg");
+  gattlingIcon = loadImage("assets/gattlingIcon.png");
+  cowboyIcon = loadImage("assets/Cowboy_Icon.png")
+  cannonIcon = loadImage("assets/cannonIcon.png")
 }
 
 
 function mapSetup() {
-  createCanvas(1400, 750);
+createCanvas(1400, 750);
 
   // Path (polyline points)
   path = new Path([
@@ -43,7 +47,7 @@ function mapSetup() {
   ]);
 
   // UI (drag & drop towers)
-  ui = new UI(path, { bg, uiBg });
+  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon});
 
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
@@ -55,6 +59,7 @@ function mapSetup() {
 }
 
 function mapDraw() {
+
   background('white');
 
 
@@ -85,6 +90,7 @@ else startWaveButton.hide();
 
     return;
   }
+
  // Normal game loop
 
   // Background
@@ -105,7 +111,7 @@ image(longBg, 0, height - 250, width, 250);
 
 // Forward mouse events to UI so TowerDragger can do its thing
 function mousePressed() {
-  ui.mousePressed();
+  ui.mousePressed(info);
 }
 function mouseDragged() {
   if (ui.mouseDragged) ui.mouseDragged();

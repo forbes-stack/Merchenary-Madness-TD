@@ -11,6 +11,7 @@ let longBg;
 let startWaveButton;
 let gattlingIcon;
 let cowboyIcon;
+let cannonIcon;
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
@@ -18,6 +19,7 @@ function preload() {
   longBg = loadImage("assets/dusty2.jpg");
   gattlingIcon = loadImage("assets/gattlingIcon.png");
   cowboyIcon = loadImage("assets/Cowboy_Icon.png")
+  cannonIcon = loadImage("assets/cannonIcon.png")
 
 }
 
@@ -45,7 +47,7 @@ function setup() {
   ]);
 
   // UI (drag & drop towers)
-  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon});
+  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon});
 
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);

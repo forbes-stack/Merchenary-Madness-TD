@@ -33,6 +33,7 @@ class UI {
     this.uiBg = assets.uiBg;
     this.gattlingIcon = assets.gattlingIcon;
     this.cowboyIcon = assets.cowboyIcon;
+    this.cannonIcon = assets.cannonIcon;
 
     // Upgrade Management
     this.upgradeManager = new UpgradeManager();
@@ -156,9 +157,9 @@ class UI {
         if (this.gattlingIcon) image(this.gattlingIcon, slot.x, slot.y, 50, 50);
         else circle(slot.x, slot.y, 30);
       } else if (slot.type === "cannon") {
-        fill(0, 0, 200);
-        let r = 18;
-        triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
+                imageMode(CENTER);
+        if (this.gattlingIcon) image(this.cannonIcon, slot.x, slot.y, 50, 50);
+        else triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
       } else if (slot.type === "sniper") {
         push();
   fill(255, 200, 0);

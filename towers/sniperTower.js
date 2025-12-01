@@ -1,7 +1,8 @@
 class SniperTower extends Tower {
   constructor(x, y) {
-    super(x, y, 60, 75, 3, "sniper"); 
-    this._shotDuration = 20;   
+    super(x, y, 60, 75, 3, "sniper");
+    this._shotDuration = 20;
+    this.maxLevel = 3;
   }
 
   // Green, thin beam
