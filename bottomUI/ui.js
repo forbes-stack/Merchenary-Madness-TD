@@ -34,6 +34,7 @@ class UI {
     this.gattlingIcon = assets.gattlingIcon;
     this.cowboyIcon = assets.cowboyIcon;
     this.cannonIcon = assets.cannonIcon;
+    this.sniperIcon = assets.sniperIcon;
 
     // Upgrade Management
     this.upgradeManager = new UpgradeManager();
@@ -158,24 +159,12 @@ class UI {
         else circle(slot.x, slot.y, 30);
       } else if (slot.type === "cannon") {
                 imageMode(CENTER);
-        if (this.gattlingIcon) image(this.cannonIcon, slot.x, slot.y, 50, 50);
+        if (this.cannonIcon) image(this.cannonIcon, slot.x, slot.y, 50, 50);
         else triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
       } else if (slot.type === "sniper") {
-        push();
-  fill(255, 200, 0);
-  noStroke();
-
-  // scaled-down diamond (about 60% size)
-  const r = 20;
-
-  beginShape();
-  vertex(slot.x,       slot.y - r);
-  vertex(slot.x - r,   slot.y);
-  vertex(slot.x,       slot.y + r);
-  vertex(slot.x + r,   slot.y);
-  endShape(CLOSE);
-
-  pop();
+        imageMode(CENTER);
+        if (this.sniperIcon) image(this.sniperIcon, slot.x, slot.y, 45, 45);
+        else triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
       }
       pop();
 
