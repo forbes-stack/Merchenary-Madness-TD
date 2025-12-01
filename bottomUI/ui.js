@@ -8,10 +8,9 @@ class UI {
 
     // Tower templates in the palette
     this.towerTypes = [
-    { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
-    { type: "gatling", range: 100, damage: 3, rate: 0.1, cost: 75 },
-    { type: "cannon", range: 150, damage: 50, rate: 1.5, cost: 125 },
-    // add more types with their own cost...
+      { type: "basic", range: 120, damage: 10, rate: 0.5, cost: 25 },
+      { type: "gatling", range: 100, damage: 3, rate: 0.1, cost: 75 },
+      { type: "cannon", range: 150, damage: 50, rate: 1.5, cost: 125 },
     ];
 
     // Palette tile centers
@@ -19,7 +18,6 @@ class UI {
       { x: 75, y: 550, type: "basic" },
       { x: 225, y: 550, type: "gatling" },
       { x: 375, y: 550, type: "cannon" },
-      // { x: 200, y: 550, type: "slow" },
     ];
 
     this.placedTowers = [];
@@ -27,94 +25,99 @@ class UI {
     // Drag helper (expects TowerDragger to be loaded)
     this.dragger = new TowerDragger(this.towerTypes, this.dropZone);
 
-    this.bg = assets.bg;   // optional, not drawn here
+    this.bg = assets.bg;
     this.uiBg = assets.uiBg;
     this.gattlingIcon = assets.gattlingIcon;
     this.cowboyIcon = assets.cowboyIcon;
 
-    //Upgrade UI
-     this.selectedTower = null;
-    // Position the upgrade panel near the HUD
-    this.upgradePanel = { x: 1100, y: 525, w: 250, h: 200 };
-    // This will be dynamically set when the panel is drawn
-    this.upgradeButtonRect = { x: 0, y: 0, w: 0, h: 0 };
+    // Upgrade Management
+    this.upgradeManager = new UpgradeManager();
+    this.selectedTower = null;
+
+    // Store button hitboxes here for mousePressed
+    this.upgradeButtons = [];
   }
 
-  // Draws the upgrade panel for the selected tower
   drawUpgradeUI(info) {
     if (!this.selectedTower) return;
 
-    let panel = this.upgradePanel;
-    let tower = this.selectedTower;
+    const t = this.selectedTower;
+    const options = this.upgradeManager.getUpgradeOptions(t);
 
-    push();
+    // CRITICAL: Clear hitboxes before drawing new ones.
+    this.upgradeButtons = [];
 
-    // Panel background
-    fill(50, 50, 50, 200); // Dark semi-transparent
-    stroke(255, 223, 0); // Gold border
-    strokeWeight(2);
-    rect(panel.x, panel.y, panel.w, panel.h, 10);
+    // Position buttons underneath the tower
+    let startY = t.y + 30;
+    let btnW = 120;
+    let btnH = 35;
 
-    // Tower Type
-    fill(255);
-    noStroke();
-    textSize(22);
-    textAlign(CENTER, TOP);
-    let towerName = tower.towerType.charAt(0).toUpperCase() + tower.towerType.slice(1);
-    text(`${towerName} Tower`, panel.x + panel.w / 2, panel.y + 15);
+    // Helper to draw a button
+    const drawBtn = (offsetY, label, cost, type) => {
+      const btnX = t.x - (btnW / 2);
+      const btnY = startY + offsetY;
 
-    // Tower Level
-    textSize(18);
-    fill(200);
-    text(`Level: ${tower.level}`, panel.x + panel.w / 2, panel.y + 45);
+      const affordable = info.currency >= cost;
 
-    // Upgrade Button
-    if (tower.isMaxLevel()) {
-      fill(150);
-      textAlign(CENTER, CENTER);
-      textSize(18);
-      text("Max Level", panel.x + panel.w / 2, panel.y + 115);
-    } else {
-      let cost = tower.getNextUpgradeCost();
-      let hasEnoughGold = info.currency >= cost;
-
-      // Define the button's position
-      this.upgradeButtonRect = {
-        x: panel.x + 25,
-        y: panel.y + 90,
-        w: panel.w - 50,
-        h: 50
-      };
-
-      // Button background
-      if (hasEnoughGold) {
-        fill(0, 150, 0); // Green
-      } else {
-        fill(150, 0, 0); // Red
-      }
+      push();
+      fill(affordable ? 'green' : 'red');
       stroke(255);
-      strokeWeight(1);
-      rect(this.upgradeButtonRect.x, this.upgradeButtonRect.y, this.upgradeButtonRect.w, this.upgradeButtonRect.h, 5);
+      rect(btnX, btnY, btnW, btnH, 5);
 
-      // Button Text
       fill(255);
       noStroke();
-      textSize(18);
       textAlign(CENTER, CENTER);
-      // Center text vertically
-      text("Upgrade", this.upgradeButtonRect.x + this.upgradeButtonRect.w / 2, this.upgradeButtonRect.y + 25);
+      textSize(14);
+      text(`${label} ($${cost})`, btnX + btnW / 2, btnY + btnH / 2);
+      pop();
 
-      // Cost Text (Gold or Red)
-      fill(hasEnoughGold ? [255, 223, 0] : [255, 100, 100]);
-      textSize(16);
-      text(`$${cost}`, this.upgradeButtonRect.x + this.upgradeButtonRect.w / 2, this.upgradeButtonRect.y + 65);
+      // Add to hitboxes
+      this.upgradeButtons.push({
+        x: btnX, y: btnY, w: btnW, h: btnH,
+        type: type // 'damage' or 'rate'
+      });
+    };
+
+    // Helper to draw locked path message
+    const drawLocked = (offsetY) => {
+        push();
+        fill(100); stroke(255); rect(t.x - (btnW/2), startY + offsetY, btnW, btnH, 5);
+        fill(200); noStroke(); textAlign(CENTER, CENTER); textSize(12);
+        text("Path Locked", t.x, startY + offsetY + btnH/2);
+        pop();
     }
 
-    pop();
+    // --- Damage Path Slot (Y Offset: 0) ---
+    if (options.damage) {
+      drawBtn(0, "Upgr Dmg", options.damage.cost, 'damage');
+    } else if (t.upgradePath === 'rate' && !t.isMaxLevel()) {
+      drawLocked(0);
+    }
+
+    // --- Rate Path Slot (Y Offset: 40) ---
+    // If anything occupies the first slot (damage button or damage lock), push this down
+    let yOffset = (options.damage || (t.upgradePath === 'rate' && !t.isMaxLevel())) ? 40 : 0;
+
+    if (options.rate) {
+      drawBtn(yOffset, "Upgr Rate", options.rate.cost, 'rate');
+    } else if (t.upgradePath === 'damage' && !t.isMaxLevel()) {
+      drawLocked(yOffset);
+    }
+
+    // --- Max Level Message ---
+    if (t.isMaxLevel()) {
+      push();
+      fill(255, 215, 0);
+      textAlign(CENTER);
+      text("MAX LEVEL", t.x, startY + 20);
+      pop();
+    }
   }
 
   display(info, allEnemies) {
-    // (palette drawing unchanged)
+    // CRITICAL: Clear old button hitboxes every single frame.
+    // This prevents "ghost buttons" from blocking clicks when the menu is closed.
+    this.upgradeButtons = [];
 
     const boxes = [
       [50, 525], [50, 625],
@@ -131,59 +134,54 @@ class UI {
 
     // Palette icons
     for (let slot of this.paletteSlots) {
+      if (!slot) continue; // Safety Check
       const base = this.towerTypes.find(t => t.type === slot.type);
       if (!base) continue;
 
       push();
       noStroke();
       if (slot.type === "basic") {
-        fill(100, 100, 255); // Blue circle
+        fill(100, 100, 255);
         imageMode(CENTER);
-image(this.cowboyIcon, slot.x, slot.y, 50, 50);
+        // Ensure image is loaded before drawing
+        if (this.cowboyIcon) image(this.cowboyIcon, slot.x, slot.y, 50, 50);
+        else circle(slot.x, slot.y, 30);
       } else if (slot.type === "gatling") {
-        fill(0, 150, 0); // Green circle
-imageMode(CENTER);
-image(this.gattlingIcon, slot.x, slot.y, 50, 50);
-        // circle(slot.x, slot.y, 30); edited out for now
+        fill(0, 150, 0);
+        imageMode(CENTER);
+        if (this.gattlingIcon) image(this.gattlingIcon, slot.x, slot.y, 50, 50);
+        else circle(slot.x, slot.y, 30);
       } else if (slot.type === "cannon") {
-        fill(0, 0, 200); // Blue triangle
+        fill(0, 0, 200);
         let r = 18;
-        triangle(
-          slot.x, slot.y - r*0.8,
-          slot.x - r, slot.y + r * 0.6,
-          slot.x + r, slot.y + r * 0.6
-        );
+        triangle(slot.x, slot.y - r * 0.8, slot.x - r, slot.y + r * 0.6, slot.x + r, slot.y + r * 0.6);
       }
       pop();
 
       const cost = base.cost;
       let hasEnoughGold = false;
-      // Check if info object exists and has currency
       if (info && typeof info.currency === 'number') {
         hasEnoughGold = info.currency >= cost;
       }
 
-      // Costs displayed under tower tiles.
       push();
       textAlign(CENTER, TOP);
       textSize(16);
       noStroke();
 
-      // Set color based on currency
       if (hasEnoughGold) {
-        fill(255, 223, 0); // Gold
+        fill(255, 223, 0);
       } else {
-        fill(255, 0, 0); // Red
+        fill(255, 0, 0);
       }
 
-      // Draw text below the icon
-      // Icon is at slot.y (550). Let's add 25px to put it below.
       text(`$${cost}`, slot.x, slot.y + 25);
       pop();
     }
 
     // Placed towers: update once with the whole enemy array, then draw
     for (let t of this.placedTowers) {
+      if (!t) continue; // Safety Check
       if (allEnemies && info) {
         t.update(allEnemies, info);
       }
@@ -192,65 +190,22 @@ image(this.gattlingIcon, slot.x, slot.y, 50, 50);
 
     // Draw selection and upgrade UI
     if (this.selectedTower) {
-      this.selectedTower.drawSelection();
-      this.drawUpgradeUI(info); // Pass info for currency check
-    }
-
-    // --- Dragging preview (ghost tower + range) ---
-    this.dragger.drawPreview(info, this.path);   // ← pass info + path
-  }
-
-  displayGameOver() {
-    // Just draw the palette and towers (no updates)
-
-    const boxes = [
-      [50, 525], [50, 625], [200, 525], [200, 625],
-      [350, 525], [350, 625], [500, 525], [500, 625],
-      [650, 525], [650, 625], [800, 525], [800, 625],
-      [950, 525], [950, 625]
-    ];
-    for (let [x, y] of boxes) {
-      rect(x, y, 50, 50);
-    }
-
-    for (let slot of this.paletteSlots) {
-      const base = this.towerTypes.find(t => t.type === slot.type);
-      if (!base) continue;
-      push();
-      noStroke();
-      fill(100, 100, 255);
-      circle(slot.x, slot.y, 30);
-      pop();
-    }
-
-    // No info object here, so just draw cost in a neutral color
-      const cost = base.cost;
-      push();
-      textAlign(CENTER, TOP);
-      textSize(16);
-      noStroke();
-      fill(200); // Neutral grey/white
-      text(`$${cost}`, slot.x, slot.y + 25);
-      pop();
-
-
-    for (let t of this.placedTowers) {
-      if (allEnemies && info) {
-        t.update(allEnemies, info);
+      // Check if the selected tower still exists
+      if (!this.placedTowers.includes(this.selectedTower)) {
+         this.selectedTower = null;
+      } else {
+         this.selectedTower.drawSelection();
+         this.drawUpgradeUI(info);
       }
-      t.draw();
     }
 
     // --- Dragging preview (ghost tower + range) ---
-    // ORIGINAL:
-    // this.dragger.drawPreview(info, this.path);
-    // CHANGE: pass placedTowers so the preview can flag overlap in red
+    // CRITICAL: Must pass placedTowers so overlap is checked
     this.dragger.drawPreview(info, this.path, this.placedTowers);
   }
 
   displayGameOver() {
-    // (unchanged visual-only drawing)
-
+    // Only visual drawing in Game Over state
     const boxes = [
       [50, 525], [50, 625], [200, 525], [200, 625],
       [350, 525], [350, 625], [500, 525], [500, 625],
@@ -263,49 +218,64 @@ image(this.gattlingIcon, slot.x, slot.y, 50, 50);
       const base = this.towerTypes.find(t => t.type === slot.type);
       if (!base) continue;
       push(); noStroke(); fill(100, 100, 255); circle(slot.x, slot.y, 30); pop();
+
+      const cost = base.cost;
+      push();
+      textAlign(CENTER, TOP);
+      textSize(16);
+      noStroke();
+      fill(200);
+      text(`$${cost}`, slot.x, slot.y + 25);
+      pop();
     }
 
-    for (let t of this.placedTowers) t.draw();
+    for (let t of this.placedTowers) {
+      if(t) t.draw();
+    }
   }
 
   mousePressed(info) {
-    // 1. Check for upgrade button click first
-    if (this.selectedTower && !this.selectedTower.isMaxLevel()) {
-      let btn = this.upgradeButtonRect;
-      if (mouseX > btn.x && mouseX < btn.x + btn.w && mouseY > btn.y && mouseY < btn.y + btn.h) {
+    // 1. Check Upgrade Buttons (CRITICAL FIX: Iterate over array, not a single variable)
+    if (this.selectedTower && this.upgradeButtons.length > 0) {
+      for (let btn of this.upgradeButtons) {
+        if (!btn) continue; // Safety Check
+        if (mouseX > btn.x && mouseX < btn.x + btn.w &&
+            mouseY > btn.y && mouseY < btn.y + btn.h) {
 
-        // This calls the tower's upgrade method, which uses UpgradeManager
-        this.selectedTower.upgrade(info);
-
-        return; // Click was handled
+          this.upgradeManager.applyUpgrade(this.selectedTower, btn.type, info);
+          return; // Click was handled (upgrade button pressed)
+        }
       }
     }
 
-    // 2. Check for shop palette click (to start drag)
+    // 2. Check Shop Palette (to start drag)
     for (let slot of this.paletteSlots) {
+      if (!slot) continue; // Safety Check
       const d = dist(mouseX, mouseY, slot.x, slot.y);
-      if (d < 30 / 2 + 10) { // small hitbox padding
-        this.selectedTower = null; // Deselect tower when buying a new one
+      if (d < 25) {
+        this.selectedTower = null; // CRITICAL: Deselect tower to clear menu
         this.dragger.startDrag(slot.type, mouseX, mouseY);
-        return; // Click was handled
+        return; // Click was handled (started drag)
       }
     }
 
-    // 3. Check for click on a placed tower
-    // Iterate backwards so we select the one on top
+    // 3. Check Placed Towers (Select a tower)
+    let clickedATower = false;
     for (let i = this.placedTowers.length - 1; i >= 0; i--) {
       let t = this.placedTowers[i];
-      // Use a 30px diameter for clicking
-      const d = dist(mouseX, mouseY, t.x, t.y);
-      if (d < 15) { // 15px radius
+      if (!t) continue; // Safety Check
+
+      if (dist(mouseX, mouseY, t.x, t.y) < 20) {
         this.selectedTower = t;
-        return; // Click was handled
+        clickedATower = true;
+        return; // Click was handled (selected tower)
       }
     }
 
-    // 4. If we clicked anywhere else (and not dragging), deselect
-    if (!this.dragger.draggingTower) {
-      this.selectedTower = null;
+    // 4. Deselect (Clicked Empty Space)
+    // If we are not dragging, and we didn't click a tower, clear selection
+    if (!this.dragger.draggingTower && !clickedATower) {
+      this.selectedTower = null; // CRITICAL: Deselect to clear menu
     }
   }
 

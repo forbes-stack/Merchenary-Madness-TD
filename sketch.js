@@ -108,7 +108,7 @@ image(longBg, 0, height - 250, width, 250);
 
 // Forward mouse events to UI so TowerDragger can do its thing
 function mousePressed() {
-  ui.mousePressed();
+  ui.mousePressed(info);
 }
 function mouseDragged() {
   if (ui.mouseDragged) ui.mouseDragged();

@@ -1,7 +1,9 @@
 class CannonTower extends Tower {
   constructor(x, y) {
-    super(x, y, 150, 50, 2.0); // slow, high damage
+    // Pass 'cannon' as the towerType
+    super(x, y, 150, 50, 2.0, 'cannon'); // <--- Updated super call
     this._shotDuration = 12;   // lingers longer to emphasize the big hit
+    this.maxLevel = 4; // Max level for Cannon is 4
   }
 
   // Blue, heavier beam
@@ -43,14 +45,6 @@ class CannonTower extends Tower {
     stroke(0, 0, 200, 60);
     strokeWeight(1);
     circle(this.x, this.y, this.range * 2);
-    noStroke();
-    fill(0, 0, 200, 160);
-    const r = 18;
-    triangle(
-      this.x, this.y - r,
-      this.x - r, this.y + r * 0.5,
-      this.x + r, this.y + r * 0.5
-    );
     pop();
   }
 }

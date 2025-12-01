@@ -29,6 +29,7 @@ class TowerDragger {
       towerInstance = new Tower(startX, startY, base.range, base.damage, base.rate);
     }
 
+    towerInstance.towerType = towerType;
     this.draggingTower = towerInstance;
     this.draggingTower.cost = this._dragCost;
 

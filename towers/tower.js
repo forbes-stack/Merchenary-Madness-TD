@@ -1,12 +1,17 @@
 // Tower.js
 class Tower {
-  constructor(x, y, range, damage, rate) {
+  constructor(x, y, range, damage, rate, towerType) {
     this.x = x;
     this.y = y;
     this.range = range;
     this.damage = damage;
     this.rate = rate;
     this.cooldown = 0;
+
+    this.towerType = towerType || 'basic'; // The type string (e.g., 'gatling', 'cannon')
+    this.level = 1;
+    this.maxLevel = 3; // Default max level. Subclasses will override.
+    this.upgradePath = null; // 'damage', 'rate', or null (for pre-choice)
 
     // tracer fields
     this._shotTimer = 0;
@@ -89,5 +94,23 @@ class Tower {
     fill(100, 100, 255, 160);
     circle(this.x, this.y, 30);
     pop();
+  }
+
+  // Draws a white ring and the range when selected
+  drawSelection() {
+    push();
+    noFill();
+    stroke(255);
+    strokeWeight(2);
+    circle(this.x, this.y, 35); // Selection ring
+
+    stroke(255, 255, 255, 100);
+    strokeWeight(1);
+    circle(this.x, this.y, this.range * 2); // Range ring
+    pop();
+  }
+
+  isMaxLevel() {
+    return this.level >= 3;
   }
 }
