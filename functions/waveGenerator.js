@@ -156,7 +156,7 @@ class WaveManager {
       if (this.spawnQueue.length === 0) {
         this.spawning = false;
         this.waitingForPlayer = true;
-        infoTracker.nextRound();
+        // infoTracker.nextRound();
       }
     }
   }
@@ -165,6 +165,7 @@ class WaveManager {
     if (this.waitingForPlayer) {
       this.waitingForPlayer = false;
       this.startWave(infoTracker);
+      infoTracker.nextRound();
     }
   }
 

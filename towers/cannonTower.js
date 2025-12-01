@@ -31,11 +31,11 @@ class CannonTower extends Tower {
       this.x + r, this.y + r * 0.5
     );
 
-    // range ring
-    noFill();
-    stroke(0, 0, 200, 50);
-    strokeWeight(1);
-    circle(this.x, this.y, this.range * 2);
+    // // range ring
+    // noFill();
+    // stroke(0, 0, 200, 50);
+    // strokeWeight(1);
+    // circle(this.x, this.y, this.range * 2);
     pop();
   }
 

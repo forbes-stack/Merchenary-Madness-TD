@@ -26,11 +26,11 @@ class GatlingGunTower extends Tower {
     noStroke();
     circle(this.x, this.y, 30);
 
-    // range ring
-    noFill();
-    stroke(0, 150, 0, 50);
-    strokeWeight(1);
-    circle(this.x, this.y, this.range * 2);
+    // // range ring
+    // noFill();
+    // stroke(0, 150, 0, 50);
+    // strokeWeight(1);
+    // circle(this.x, this.y, this.range * 2);
     pop();
   }
 

@@ -23,19 +23,19 @@ class SniperTower extends Tower {
     fill(150, 0, 0);
     noStroke();
    fill(255, 200, 0);
-noStroke();
-beginShape();
-vertex(this.x, this.y - 15);
-vertex(this.x - 15, this.y);
-vertex(this.x, this.y + 15);
-vertex(this.x + 15, this.y);
-endShape(CLOSE);
+    noStroke();
+    beginShape();
+    vertex(this.x, this.y - 15);
+    vertex(this.x - 15, this.y);
+    vertex(this.x, this.y + 15);
+    vertex(this.x + 15, this.y);
+    endShape(CLOSE);
 
-    // range ring
-    noFill();
-    stroke(0, 150, 0, 50);
-    strokeWeight(1);
-    circle(this.x, this.y, this.range * 2);
+    // // range ring
+    // noFill();
+    // stroke(0, 150, 0, 50);
+    // strokeWeight(1);
+    // circle(this.x, this.y, this.range * 2);
     pop();
   }
 

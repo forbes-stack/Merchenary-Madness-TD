@@ -107,10 +107,10 @@ this._shotTimer = this._shotDuration;
     fill(100, 100, 255);
     circle(this.x, this.y, 30);
 
-    // range
+    // // range
     noFill();
-    stroke(0, 0, 255, 50);
-    circle(this.x, this.y, this.range * 2);
+    // stroke(0, 0, 255, 50);
+    // circle(this.x, this.y, this.range * 2);
   }
 
   drawGhost() {
