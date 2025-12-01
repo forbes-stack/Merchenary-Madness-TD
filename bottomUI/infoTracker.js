@@ -49,18 +49,10 @@ class InfoTracker {
     this.currency += amount;
   }
 
-  /**
-   * Advances the game to the next round.
-   */
-  // ORIGINAL:
-  // nextRound() {
-  //   this.round++;
-  //   this.addCurrency(50 + this.round * 5); // adds currency for completing round.
-  // }
 
-  // CHANGED: linear growth — end of round N pays 10 * N, then increment round
+  // Progresses the game to the next round, gives the user a currency after beating the wave, currency does not go over 10.
   nextRound() {
-    this.addCurrency(10 * this.round); // payout for the round that just ended
+    this.addCurrency(10); // payout for the round that just ended
     this.round += 1;                   // move to the next round
   }
 
