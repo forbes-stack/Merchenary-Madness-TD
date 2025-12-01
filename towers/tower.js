@@ -9,7 +9,7 @@ class Tower {
     this.cooldown = 0;
 
     this.towerType = towerType || 'basic'; // The type string (e.g., 'gatling', 'cannon')
-    this.level = 1;
+    this.level = 0;
     this.maxLevel = 3; // Default max level. Subclasses will override.
     this.upgradePath = null; // 'damage', 'rate', or null (for pre-choice)
 
