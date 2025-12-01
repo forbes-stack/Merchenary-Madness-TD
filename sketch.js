@@ -22,7 +22,6 @@ function preload() {
   cowboyIcon = loadImage("assets/Cowboy_Icon.png");
   cannonIcon = loadImage("assets/cannonIcon.png");
   sniperIcon = loadImage("assets/sniperIcon.png");
-
 }
 
 function setup() {
@@ -49,7 +48,7 @@ function setup() {
   ]);
 
   // UI (drag & drop towers)
-  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon, sniperIcon});
+  ui = new UI(path, { bg, uiBg, gattlingIcon, cowboyIcon, cannonIcon, sniperIcon });
 
   // HUD / currency / lives tracker
   info = new InfoTracker(100, 1);
@@ -63,48 +62,41 @@ function setup() {
 function draw() {
   background('white');
 
+  // Show or hide Start Wave button based on WaveManager
+  if (waveManager && waveManager.waitingForPlayer) startWaveButton.show();
+  else startWaveButton.hide();
 
-  if (waveManager.waitingForPlayer) startWaveButton.show();
-else startWaveButton.hide();
-
-// Game Over overlay
+  // --- Game Over state ---
   if (info && info.isGameOver) {
-    image(bg, 0, 0, width, height);
-    ui.displayGameOver();
+    // Hide the start wave button while game over
+    startWaveButton.hide();
 
-    // Darken screen
-    push();
-    fill(0, 0, 0, 150);
-    rect(0, 0, width, height);
-    pop();
+    // Draw background like a frozen game state
+    image(bg, 0, 0, width, height - 250);
+    image(longBg, 0, height - 250, width, 250);
 
+    // Draw HUD so player still sees final stats
     info.draw();
 
-    push();
-    fill(255, 0, 0);
-    textSize(80);
-    textAlign(CENTER, CENTER);
-    stroke(0);
-    strokeWeight(4);
-    text("GAME OVER", width / 2, height / 2);
-    pop();
+    // Draw Game Over overlay + Restart button
+    ui.displayGameOver();
 
+    // Stop updating game logic
     return;
   }
 
-  // Normal game loop
+  // --- Normal game loop ---
 
   // Background
-  /* Height - 250 is to re-align menu screen */
   image(bg, 0, 0, width, height - 250);
-image(longBg, 0, height - 250, width, 250);
+  image(longBg, 0, height - 250, width, 250);
+
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, waveManager.activeEnemies);
 
+  // Update and draw enemies / waves
   waveManager.update(info);
   waveManager.draw();
-
-  // Optional: draw the path outline
 
   // HUD
   info.draw();
@@ -112,14 +104,23 @@ image(longBg, 0, height - 250, width, 250);
 
 // Forward mouse events to UI so TowerDragger can do its thing
 function mousePressed() {
+  // If game is over, check only the restart button
+  if (info && info.isGameOver) {
+    ui.handleGameOverClick(restartGame);
+    return;
+  }
+
   ui.mousePressed(info);
 }
+
 function mouseDragged() {
   if (ui.mouseDragged) ui.mouseDragged();
 }
+
 function mouseMoved() {
   if (ui.mouseMoved) ui.mouseMoved();
 }
+
 function mouseReleased() {
   ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
@@ -141,6 +142,22 @@ function createStartWaveButton() {
 
   // Hook it up to WaveManager
   startWaveButton.mousePressed(() => {
-  waveManager.startNextWave(info);
+    waveManager.startNextWave(info);
   });
+}
+
+/**
+ * Restart the game back to "round 0" and clear towers/enemies.
+ */
+function restartGame() {
+  // Reset tracked info (health, gold, round, isGameOver)
+  info.reset();
+
+  // Clear towers
+  ui.placedTowers = [];
+  ui.selectedTower = null;
+
+  // Reset WaveManager and start fresh
+  waveManager = new WaveManager(path);
+  waveManager.startWave(info);
 }

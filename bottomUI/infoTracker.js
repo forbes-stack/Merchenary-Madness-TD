@@ -1,5 +1,4 @@
 // infoTracker.js
-// infoTracker.js
 class InfoTracker {
   /**
    * @param {number} startHealth Initial health for the user.
@@ -10,6 +9,17 @@ class InfoTracker {
     this.health = startHealth;
     this.currency = 100;
     this.round = startRound;
+    this.isGameOver = false;
+  }
+
+  /**
+   * Reset all tracked values for a new game.
+   * Sets round back to 0, restores health and starting currency.
+   */
+  reset() {
+    this.health = this.maxHealth;
+    this.currency = 100;
+    this.round = 0;        // restart to round 0
     this.isGameOver = false;
   }
 
@@ -30,7 +40,7 @@ class InfoTracker {
 
   // method to update the round number
   setRound(newRound) {
-      this.round = newRound;
+    this.round = newRound;
   }
 
   // attempt to spend currency; returns true if success
@@ -49,11 +59,10 @@ class InfoTracker {
     this.currency += amount;
   }
 
-
-  // Progresses the game to the next round, gives the user a currency after beating the wave, currency does not go over 10.
+  // Progresses the game to the next round, gives the user a currency after beating the wave
   nextRound() {
     this.addCurrency(10); // payout for the round that just ended
-    this.round += 1;                   // move to the next round
+    this.round += 1;      // move to the next round
   }
 
   /**
@@ -80,7 +89,6 @@ class InfoTracker {
 
     // Gold
     push();
-    fill(218, 165, 32);
     textSize(30);
     textAlign(LEFT, CENTER);
     noStroke();
@@ -110,7 +118,6 @@ class InfoTracker {
     pop();
 
     push();
-    fill(0);
     textSize(18);
     textAlign(CENTER, CENTER);
     fill(255, 255, 255, 150);
@@ -121,7 +128,6 @@ class InfoTracker {
 
     // Round
     push();
-    fill(255);
     textSize(30);
     textAlign(LEFT, CENTER);
     noStroke();
