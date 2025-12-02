@@ -10,8 +10,8 @@ class UI {
     this.towerTypes = [
       { type: "basic",   range: 120, damage: 10, rate: 0.5, cost: 25 },
       { type: "gatling", range: 100, damage: 3,  rate: 0.1, cost: 75 },
-      { type: "cannon",  range: 150, damage: 50, rate: 1.25, cost: 100 },
-      { type: "sniper",  range: 20,  damage: 75, rate: 1.5, cost: 150 },
+      { type: "cannon",  range: 150, damage: 50, rate: 1.5, cost: 100 },
+      { type: "sniper",  range: 20,  damage: 75, rate: 1.5, cost: 125 },
       // add more types with their own cost...
     ];
 
@@ -44,6 +44,88 @@ class UI {
 
     // Restart button hitbox (used in Game Over state)
     this.restartButton = null;
+
+    // Pause menu buttons (resume/restart)
+    this.pauseButtons = [];
+  }
+
+  /**
+   * Base purchase cost of a tower instance (no upgrades).
+   * Uses the palette definitions and tower.towerType.
+   */
+  getTowerBaseCost(tower) {
+    if (!tower) return 0;
+
+    // Prefer explicit base cost if you ever set it on tower
+    if (typeof tower.baseCost === "number") {
+      return tower.baseCost;
+    }
+
+    const typeKey = tower.towerType || tower.type; // support both just in case
+    if (!typeKey) return 0;
+
+    const def = this.towerTypes.find(tt => tt.type === typeKey);
+    if (def && typeof def.cost === "number") {
+      return def.cost;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Total gold invested in this tower:
+   * base cost + all upgrade costs on its chosen path.
+   */
+  getTowerTotalInvestedCost(tower) {
+    if (!tower) return 0;
+
+    const baseCost = this.getTowerBaseCost(tower);
+    const typeKey = tower.towerType || tower.type;
+    const path = tower.upgradePath;  // 'damage' or 'rate' or null
+    const level = tower.level || 0;  // 0..3
+
+    if (!this.upgradeManager || !this.upgradeManager.upgrades[typeKey]) {
+      return baseCost;
+    }
+
+    // If no path chosen yet, no upgrades were applied
+    if (path !== "damage" && path !== "rate") {
+      return baseCost;
+    }
+
+    const pathUpgrades = this.upgradeManager.upgrades[typeKey][path];
+    if (!pathUpgrades) return baseCost;
+
+    let extra = 0;
+    const appliedLevels = Math.min(level, pathUpgrades.length);
+    for (let i = 0; i < appliedLevels; i++) {
+      extra += pathUpgrades[i].cost;
+    }
+
+    return baseCost + extra;
+  }
+
+  /**
+   * Sell the currently selected tower for half its total invested value.
+   */
+  sellSelectedTower(info) {
+    if (!this.selectedTower || !info) return;
+
+    const totalCost = this.getTowerTotalInvestedCost(this.selectedTower);
+    const refund = Math.floor(totalCost / 2);
+
+    if (refund > 0 && typeof info.addCurrency === "function") {
+      info.addCurrency(refund);
+    }
+
+    // Remove tower from placedTowers
+    const idx = this.placedTowers.indexOf(this.selectedTower);
+    if (idx !== -1) {
+      this.placedTowers.splice(idx, 1);
+    }
+
+    // Clear selection so the menu closes
+    this.selectedTower = null;
   }
 
   drawUpgradeUI(info) {
@@ -82,7 +164,7 @@ class UI {
       // Add to hitboxes
       this.upgradeButtons.push({
         x: btnX, y: btnY, w: btnW, h: btnH,
-        type: type // 'damage' or 'rate'
+        type: type // 'damage' or 'rate' or 'sell'
       });
     };
 
@@ -100,30 +182,63 @@ class UI {
       pop();
     };
 
-    // --- Damage Path Slot (Y Offset: 0) ---
+    // --- Upgrades layout ---
+    let nextOffsetY = 0;
+
+    // Damage option
     if (options.damage) {
       drawBtn(0, "Upgr Dmg", options.damage.cost, 'damage');
+      nextOffsetY = 40;
     } else if (t.upgradePath === 'rate' && !t.isMaxLevel()) {
       drawLocked(0);
+      nextOffsetY = 40;
     }
 
-    // --- Rate Path Slot (Y Offset: 40) ---
-    let yOffset = (options.damage || (t.upgradePath === 'rate' && !t.isMaxLevel())) ? 40 : 0;
-
+    // Rate option
     if (options.rate) {
-      drawBtn(yOffset, "Upgr Rate", options.rate.cost, 'rate');
+      drawBtn(nextOffsetY, "Upgr Rate", options.rate.cost, 'rate');
+      nextOffsetY += 40;
     } else if (t.upgradePath === 'damage' && !t.isMaxLevel()) {
-      drawLocked(yOffset);
+      drawLocked(nextOffsetY);
+      nextOffsetY += 40;
     }
 
-    // --- Max Level Message ---
-    if (t.isMaxLevel()) {
+    // Max level message
+    if (t.isMaxLevel && t.isMaxLevel()) {
       push();
       fill(255, 215, 0);
       textAlign(CENTER);
-      text("MAX LEVEL", t.x, startY + 20);
+      text("MAX LEVEL", t.x, startY + nextOffsetY + 15);
       pop();
+      nextOffsetY += 35;
     }
+
+    // --- Sell Button (always available when tower is selected) ---
+    const totalCost = this.getTowerTotalInvestedCost(t);
+    const sellPrice = Math.floor(totalCost / 2);
+
+    const sellOffsetY = nextOffsetY + 10; // a bit below other buttons
+    const sellX = t.x - (btnW / 2);
+    const sellY = startY + sellOffsetY;
+
+    push();
+    rectMode(CORNER);
+    fill(150, 75, 0);  // brown-ish sell button
+    stroke(255);
+    rect(sellX, sellY, btnW, btnH, 5);
+
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(14);
+    text(`Sell ($${sellPrice})`, sellX + btnW / 2, sellY + btnH / 2);
+    pop();
+
+    // Add sell button hitbox
+    this.upgradeButtons.push({
+      x: sellX, y: sellY, w: btnW, h: btnH,
+      type: 'sell'
+    });
   }
 
   display(info, allEnemies) {
@@ -273,6 +388,83 @@ class UI {
   }
 
   /**
+   * Pause menu overlay with Resume + Restart buttons.
+   */
+  displayPauseMenu() {
+    // Clear previous pause button hitboxes
+    this.pauseButtons = [];
+
+    // Dim the entire screen (a bit lighter than game over if you want)
+    push();
+    fill(0, 0, 0, 140);
+    noStroke();
+    rect(0, 0, width, height);
+    pop();
+
+    // "PAUSED" text
+    push();
+    textAlign(CENTER, CENTER);
+    textSize(70);
+    stroke(0);
+    strokeWeight(4);
+    fill(255);
+    text("PAUSED", width / 2, height / 2 - 100);
+    pop();
+
+    const btnW = 220;
+    const btnH = 60;
+    const centerX = width / 2 - btnW / 2;
+    const resumeY = height / 2 - 10;
+    const restartY = resumeY + 80;
+
+    // Resume button
+    push();
+    rectMode(CORNER);
+    fill(70, 130, 180); // bluish
+    stroke(0);
+    strokeWeight(3);
+    rect(centerX, resumeY, btnW, btnH, 12);
+
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    text("Resume", centerX + btnW / 2, resumeY + btnH / 2);
+    pop();
+
+    this.pauseButtons.push({
+      x: centerX,
+      y: resumeY,
+      w: btnW,
+      h: btnH,
+      type: "resume"
+    });
+
+    // Restart button (reuse same label style as game over)
+    push();
+    rectMode(CORNER);
+    fill(50, 200, 50);
+    stroke(0);
+    strokeWeight(3);
+    rect(centerX, restartY, btnW, btnH, 12);
+
+    fill(0);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(24);
+    text("Restart", centerX + btnW / 2, restartY + btnH / 2);
+    pop();
+
+    this.pauseButtons.push({
+      x: centerX,
+      y: restartY,
+      w: btnW,
+      h: btnH,
+      type: "restart"
+    });
+  }
+
+  /**
    * Handle clicks when the game is over.
    * `onRestart` is a callback (like restartGame in sketch.js).
    */
@@ -290,16 +482,42 @@ class UI {
     }
   }
 
+  /**
+   * Handle clicks when the game is paused.
+   * `onResume` and `onRestart` come from sketch.js
+   */
+  handlePauseClick(onResume, onRestart) {
+    if (!this.pauseButtons || this.pauseButtons.length === 0) return;
+
+    for (let b of this.pauseButtons) {
+      if (
+        mouseX > b.x && mouseX < b.x + b.w &&
+        mouseY > b.y && mouseY < b.y + b.h
+      ) {
+        if (b.type === "resume" && typeof onResume === "function") {
+          onResume();
+        } else if (b.type === "restart" && typeof onRestart === "function") {
+          onRestart();
+        }
+        return;
+      }
+    }
+  }
+
   mousePressed(info) {
-    // 1. Check Upgrade Buttons
+    // 1. Check Upgrade / Sell Buttons
     if (this.selectedTower && this.upgradeButtons.length > 0) {
       for (let btn of this.upgradeButtons) {
         if (!btn) continue;
         if (mouseX > btn.x && mouseX < btn.x + btn.w &&
             mouseY > btn.y && mouseY < btn.y + btn.h) {
 
-          this.upgradeManager.applyUpgrade(this.selectedTower, btn.type, info);
-          return; // Click was handled (upgrade button pressed)
+          if (btn.type === 'sell') {
+            this.sellSelectedTower(info);
+          } else {
+            this.upgradeManager.applyUpgrade(this.selectedTower, btn.type, info);
+          }
+          return; // Click was handled
         }
       }
     }
