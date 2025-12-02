@@ -32,71 +32,81 @@ class Tower {
   // Reusable tracer (call this at the start of draw() in subclasses)
   _drawShotTracer() {
     if (this._shotTimer > 0) {
-    const style = this._beamStyle();
+      const style = this._beamStyle();
 
-    push();
-    strokeWeight(style.strokeWeight);
-    stroke(...style.stroke);
+      push();
+      strokeWeight(style.strokeWeight);
+      stroke(...style.stroke);
 
-    line(this.x, this.y, this._lastShotX, this._lastShotY);
+      line(this.x, this.y, this._lastShotX, this._lastShotY);
 
-    // impact flash
-    fill(...style.impact);
-    noStroke();
-    circle(this._lastShotX, this._lastShotY, style.impactSize);
+      // impact flash
+      fill(...style.impact);
+      noStroke();
+      circle(this._lastShotX, this._lastShotY, style.impactSize);
 
-    pop();
+      pop();
 
-    this._shotTimer--;
+      this._shotTimer--;
+    }
   }
+
+  // 🔹 NEW: generic damage hook — default is single-target
+  applyDamage(mainTarget, allEnemies, infoTracker) {
+    if (!mainTarget || !mainTarget.alive) return;
+    if (typeof mainTarget.takeDamage === "function") {
+      mainTarget.takeDamage(this.damage, infoTracker);
+    }
   }
 
   update(enemies, infoTracker) {
-if (!enemies || enemies.length === 0) return;
-if (this.cooldown > 0) { this.cooldown--; return; }
+    if (!enemies || enemies.length === 0) return;
+    if (this.cooldown > 0) { this.cooldown--; return; }
 
-let target = null;
-let maxProgress = -Infinity;
+    let target = null;
+    let maxProgress = -Infinity;
 
-for (let enemy of enemies) {
-  if (!enemy || !enemy.alive) continue;
+    for (let enemy of enemies) {
+      if (!enemy || !enemy.alive) continue;
 
-  const d = dist(this.x, this.y, enemy.x, enemy.y);
-  if (d > this.range) continue; // skip out-of-range enemies
+      const d = dist(this.x, this.y, enemy.x, enemy.y);
+      if (d > this.range) continue; // skip out-of-range enemies
 
-  // Compute progress along path (index + fraction along segment)
-  const idx = enemy.pathIndex - 1; // previous waypoint
-  if (idx < 0 || idx >= enemy.path.length - 1) continue;
+      // Compute progress along path (index + fraction along segment)
+      const idx = enemy.pathIndex - 1; // previous waypoint
+      if (idx < 0 || idx >= enemy.path.length - 1) continue;
 
-  const prev = enemy.path[idx];
-  const next = enemy.path[idx + 1];
+      const prev = enemy.path[idx];
+      const next = enemy.path[idx + 1];
 
-  const dx = next.x - prev.x;
-  const dy = next.y - prev.y;
-  const segmentLength = Math.hypot(dx, dy);
-  if (segmentLength === 0) continue;
+      const dx = next.x - prev.x;
+      const dy = next.y - prev.y;
+      const segmentLength = Math.hypot(dx, dy);
+      if (segmentLength === 0) continue;
 
-  const dxEnemy = enemy.x - prev.x;
-  const dyEnemy = enemy.y - prev.y;
-  const segmentProgress = Math.hypot(dxEnemy, dyEnemy) / segmentLength;
+      const dxEnemy = enemy.x - prev.x;
+      const dyEnemy = enemy.y - prev.y;
+      const segmentProgress = Math.hypot(dxEnemy, dyEnemy) / segmentLength;
 
-  const progress = idx + segmentProgress;
+      const progress = idx + segmentProgress;
 
-  if (progress > maxProgress) {
-    maxProgress = progress;
-    target = enemy;
-  }
-}
+      if (progress > maxProgress) {
+        maxProgress = progress;
+        target = enemy;
+      }
+    }
 
-if (target) {
-  target.takeDamage(this.damage, infoTracker);
-  this.cooldown = Math.ceil(this.rate * 60);
+    if (target) {
+      // 🔹 CHANGED: use applyDamage instead of direct takeDamage
+      this.applyDamage(target, enemies, infoTracker);
 
-// store snapshot position so tracer works even if the enemy dies
-this._lastShotX = target.x;
-this._lastShotY = target.y;
-this._shotTimer = this._shotDuration;
-}
+      this.cooldown = Math.ceil(this.rate * 60);
+
+      // store snapshot position so tracer works even if the enemy dies
+      this._lastShotX = target.x;
+      this._lastShotY = target.y;
+      this._shotTimer = this._shotDuration;
+    }
   }
 
   draw() {
