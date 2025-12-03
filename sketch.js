@@ -15,6 +15,7 @@ let cowboyIcon;
 let cannonIcon;
 let sniperIcon;
 let isPaused = false; // pause flag
+let cowboyTower;
 
 function preload() {
   bg = loadImage("assets/Wild_West_Bg.png");
@@ -24,6 +25,7 @@ function preload() {
   cowboyIcon = loadImage("assets/Cowboy_Icon.png");
   cannonIcon = loadImage("assets/cannonIcon.png");
   sniperIcon = loadImage("assets/sniperIcon.png");
+  cowboyTower = loadImage("assets/cowboyTower.png");
 }
 
 function setup() {
