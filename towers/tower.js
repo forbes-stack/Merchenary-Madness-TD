@@ -114,9 +114,10 @@ class Tower {
     this._drawShotTracer();
 
     // body
-    fill(100, 100, 255);
-    circle(this.x, this.y, 30);
-
+    push();
+    imageMode(CENTER);
+    image(cowboyTower, this.x, this.y)
+pop();
     // // range
     noFill();
     // stroke(0, 0, 255, 50);
