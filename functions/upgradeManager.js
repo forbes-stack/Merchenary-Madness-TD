@@ -8,9 +8,9 @@ const createDamagePath = () => [
 
     // Rate Path: Cost 75, 0.85x Rate multiplier (smaller is faster)
     const createRatePath = () => [
-      { cost: 50, damageMod: 1.0, rateMod: 0.75, label: "Rate Lvl 1" },
-      { cost: 75, damageMod: 1.0, rateMod: 0.50, label: "Rate Lvl 2" },
-      { cost: 100, damageMod: 1.0, rateMod: 0.25, label: "Rate Lvl 3" }
+      { cost: 50, damageMod: 1.0, rateMod: 0.80, label: "Rate Lvl 1" },
+      { cost: 75, damageMod: 1.0, rateMod: 0.60, label: "Rate Lvl 2" },
+      { cost: 100, damageMod: 1.0, rateMod: 0.50, label: "Rate Lvl 3" }
     ];
 
     this.upgrades = {

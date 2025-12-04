@@ -31,16 +31,13 @@ class WaveManager {
 
     console.log(`Round ${roundNumber}: Spawn Interval set to ${this.spawnInterval} frames.`);
 
-    // --- 2. Enemy Count Scaling (Easy for rounds 1-5, then harder) ---
+    // --- 2. Enemy Count Scaling ---
 
     // Basic enemies: Always spawn, moderate growth.
     let basicCount;
     if (roundNumber <= 5) {
-      // Easy rounds 1-5: Linear, slow growth (R1=5, R5=17)
       basicCount = 5 + ((roundNumber - 1) * 3);
     } else {
-      // Harder rounds 6+: Faster linear growth
-      // Starts at 17 + 10 = 27 for R6
       basicCount = 17 + ((roundNumber - 5) * 10);
     }
     for (let i = 0; i < basicCount; i++) {
@@ -51,11 +48,8 @@ class WaveManager {
     if (roundNumber >= 3) {
       let tankCount;
       if (roundNumber <= 5) {
-        // Easy rounds 3-5: Slow growth (R3=1, R5=3)
         tankCount = roundNumber - 2;
       } else {
-        // Harder rounds 6+: Faster exponential growth
-        // Starts at 3 + 1 = 4 for R6
         tankCount = 3 + Math.floor(Math.pow(1.5, roundNumber - 5));
       }
       for (let i = 0; i < tankCount; i++) {
@@ -67,11 +61,8 @@ class WaveManager {
     if (roundNumber >= 5) {
       let fastCount;
       if (roundNumber == 5) {
-        // Round 5: Small introduction (5)
         fastCount = 5;
       } else {
-        // Harder rounds 6+: Rapid growth
-        // Starts at 5 + 15 = 20 for R6
         fastCount = 5 + ((roundNumber - 5) * 15);
       }
       for (let i = 0; i < fastCount; i++) {
@@ -79,10 +70,16 @@ class WaveManager {
       }
     }
 
+    // --- 3. Shuffle the Wave (Mix types together) ---
+    // Fisher-Yates Shuffle to prevent enemies from spawning in blocks (e.g. all Tanks then all Basics)
+    for (let i = waveEnemies.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [waveEnemies[i], waveEnemies[j]] = [waveEnemies[j], waveEnemies[i]];
+    }
+
     console.log(`Round ${roundNumber}: Spawning ${waveEnemies.length} enemies.`);
 
     // reverse the array so we can efficiently .pop() from the end
-    // without re-indexing the whole array.
     return waveEnemies.reverse();
   }
 
@@ -114,13 +111,8 @@ class WaveManager {
     // 1. Update all active enemies
     for (let i = this.activeEnemies.length - 1; i >= 0; i--) {
       let enemy = this.activeEnemies[i];
-      // Pass infoTracker, as the enemy's update method
-      // needs it to damage the player if it finishes.
       enemy.update(infoTracker);
 
-      // If enemy is no longer alive (either killed or finished path),
-      // remove it. The enemy's own methods (takeDamage, update)
-      // will handle giving rewards or losing health.
       if (!enemy.alive) {
         this.activeEnemies.splice(i, 1);
       }
@@ -132,7 +124,6 @@ class WaveManager {
 
       if (this.spawnTimer <= 0 && this.spawnQueue.length > 0) {
         let enemyType = this.spawnQueue.pop(); // Get next enemy type (string)
-
         let newEnemy;
 
         // Create the new Enemy instance based on its type
@@ -144,8 +135,27 @@ class WaveManager {
           newEnemy = new fastEnemy(this.pathPoints);
         }
 
+        // --- APPLY STAT BOOSTS (Every 10 Rounds) ---
         if (newEnemy) {
-          this.activeEnemies.push(newEnemy);
+            // Calculate Tier: 0 for Rounds 1-10, 1 for 11-20, 2 for 21-30, etc.
+            const tier = Math.floor((infoTracker.round - 1) / 10);
+
+            if (tier > 0) {
+                // Buffs:
+                // Health: +30% per tier
+                // Speed: +10% per tier (capped at max 3x speed to prevent glitching)
+
+                const hpMultiplier = 1 + (tier * 0.30);
+                const spdMultiplier = 1 + (tier * 0.10);
+
+                newEnemy.maxHealth = Math.floor(newEnemy.maxHealth * hpMultiplier);
+                newEnemy.health = newEnemy.maxHealth; // Reset current health to new max
+
+                // Apply speed buff, but cap it so they don't fly off the map
+                newEnemy.speed = Math.min(newEnemy.speed * spdMultiplier, newEnemy.speed * 3);
+            }
+
+            this.activeEnemies.push(newEnemy);
         }
 
         // Reset timer for next spawn
@@ -156,7 +166,7 @@ class WaveManager {
       if (this.spawnQueue.length === 0) {
         this.spawning = false;
         this.waitingForPlayer = true;
-        // infoTracker.nextRound();
+        infoTracker.nextRound();
       }
     }
   }
@@ -164,8 +174,7 @@ class WaveManager {
   startNextWave(infoTracker) {
     if (this.waitingForPlayer) {
       this.waitingForPlayer = false;
-    infoTracker.nextRound();       // increment first
-    this.startWave(infoTracker);   // then generate wave for new round
+      this.startWave(infoTracker);
     }
   }
 
