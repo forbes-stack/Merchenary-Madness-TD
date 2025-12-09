@@ -16,10 +16,21 @@ this.currency = currency;
 
   // moves the enemy to the target point
   move(target){
-if (this.x < target.x) this.x += this.speed;
-  if (this.x > target.x) this.x -= this.speed;
-  if (this.y < target.y) this.y += this.speed;
-  if (this.y > target.y) this.y -= this.speed;
+
+  // added an if-else where if the enemy's location is diagonal from the current target 
+  // point adds to the speed of x and a percentage of y's speed.
+  if (this.x < target.x && this.y > target.y) {
+    this.x += this.speed;
+    this.y -= this.speed * 0.47;
+  } else if (this.x < target.x && this.y < target.y) {
+    this.x += this.speed;
+    this.y += this.speed * 0.47;
+  } else {
+    if (this.x < target.x) this.x += this.speed;
+    if (this.x > target.x) this.x -= this.speed;
+    if (this.y < target.y) this.y += this.speed;
+    if (this.y > target.y) this.y -= this.speed;
+  }
 
 //to avoid over shoot / undershoot of points, if enemy is within one "speed step"
 //from the target point then snap to the point and consider reached.
