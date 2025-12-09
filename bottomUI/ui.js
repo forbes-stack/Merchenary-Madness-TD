@@ -17,10 +17,11 @@ class UI {
 
     // Palette tile centers
     this.paletteSlots = [
-      { x: 75,  y: 550, type: "basic" },
-      { x: 225, y: 550, type: "gatling" },
-      { x: 375, y: 550, type: "cannon" },
-      { x: 525, y: 550, type: "sniper" }
+      { x: 150,  y: 620, type: "basic" },
+      { x: 325, y: 620, type: "gatling" },
+      { x: 500, y: 620, type: "cannon" },
+      { x: 675, y: 620, type: "sniper" }
+      // if you want to add another x: 850, y: 620
     ];
 
     this.placedTowers = [];
@@ -245,17 +246,26 @@ class UI {
     // CRITICAL: Clear old button hitboxes every single frame.
     this.upgradeButtons = [];
 
+    // deleted blank boxes and re-adjusted placement of boxes
     const boxes = [
-      [50, 525], [50, 625],
-      [200, 525], [200, 625],
-      [350, 525], [350, 625],
-      [500, 525], [500, 625],
-      [650, 525], [650, 625],
-      [800, 525], [800, 625],
-      [950, 525], [950, 625]
+      [100, 570],
+      [275, 570],
+      [450, 570],
+      [625, 570],
+      [800, 570],
     ];
+    /**
+     * OLD BOXES
+    const boxes = [
+      [50, 525],
+      [200, 525],
+      [350, 525],
+      [500, 525],
+      [650, 525],
+    ];
+     */
     for (let [x, y] of boxes) {
-      rect(x, y, 50, 50);
+      rect(x, y, 100, 100);
     }
 
     // Palette icons
@@ -269,16 +279,16 @@ class UI {
       if (slot.type === "basic") {
         fill(100, 100, 255);
         imageMode(CENTER);
-        if (this.cowboyIcon) image(this.cowboyIcon, slot.x, slot.y, 50, 50);
+        if (this.cowboyIcon) image(this.cowboyIcon, slot.x, slot.y, 100, 100);
         else circle(slot.x, slot.y, 30);
       } else if (slot.type === "gatling") {
         fill(0, 150, 0);
         imageMode(CENTER);
-        if (this.gattlingIcon) image(this.gattlingIcon, slot.x, slot.y, 50, 50);
+        if (this.gattlingIcon) image(this.gattlingIcon, slot.x, slot.y, 100, 100);
         else circle(slot.x, slot.y, 30);
       } else if (slot.type === "cannon") {
         imageMode(CENTER);
-        if (this.cannonIcon) image(this.cannonIcon, slot.x, slot.y, 50, 50);
+        if (this.cannonIcon) image(this.cannonIcon, slot.x, slot.y, 100, 100);
         else {
           const r = 15;
           triangle(
@@ -288,8 +298,9 @@ class UI {
           );
         }
       } else if (slot.type === "sniper") {
+        fill(0, 150, 0);
         imageMode(CENTER);
-        if (this.sniperIcon) image(this.sniperIcon, slot.x, slot.y, 45, 45);
+        if (this.sniperIcon) image(this.sniperIcon, slot.x, slot.y, 90, 90);
         else {
           const r = 15;
           triangle(
@@ -526,7 +537,8 @@ class UI {
     for (let slot of this.paletteSlots) {
       if (!slot) continue;
       const d = dist(mouseX, mouseY, slot.x, slot.y);
-      if (d < 25) {
+      // altered this for the increased box palette/box size
+      if (d < 58) {
         this.selectedTower = null; // Deselect tower to clear menu
         this.dragger.startDrag(slot.type, mouseX, mouseY);
         return;
