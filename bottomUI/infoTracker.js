@@ -70,8 +70,8 @@ class InfoTracker {
    * Draws all UI Tracker elements (health bar, currency, round number)
    */
   draw() {
-    let panelW = 300;
-    let panelH = 200;
+    let panelW = 350;
+    let panelH = 250;
 
     // anchor to bottom-right
     let panelX = width - panelW;
@@ -90,20 +90,23 @@ class InfoTracker {
 
     // Gold
     push();
-    textSize(30);
+    textSize(40);
     textAlign(LEFT, CENTER);
     noStroke();
     fill(0, 0, 0, 100);
-    text(`💰 Gold: ${this.currency}`, panelX + 27, panelY + 52);
+    text(`Gold: ${this.currency}`, panelX + 97, panelY + 58);
     fill(255, 223, 0);
-    text(`💰 Gold: ${this.currency}`, panelX + 25, panelY + 50);
+    textSize(60);
+    text(`💰`, panelX + 15, panelY + 52);
+    textSize(40);
+    text(`Gold: ${this.currency}`, panelX + 95, panelY + 55);
     pop();
 
     // Health bar
     let barWidth = panelW - 50;
-    let barHeight = 25;
+    let barHeight = 50;
     let xPos = panelX + 25;
-    let yPos = panelY + 85;
+    let yPos = panelY + 93;
     let currentHealthWidth = map(this.health, 0, this.maxHealth, 0, barWidth);
 
     push();
@@ -119,7 +122,7 @@ class InfoTracker {
     pop();
 
     push();
-    textSize(18);
+    textSize(25);
     textAlign(CENTER, CENTER);
     fill(255, 255, 255, 150);
     text(`${this.health} / ${this.maxHealth}`, xPos + barWidth / 2 + 1, yPos + barHeight / 2 + 1);
@@ -129,13 +132,16 @@ class InfoTracker {
 
     // Round
     push();
-    textSize(30);
+    textSize(40);
     textAlign(LEFT, CENTER);
     noStroke();
     fill(0, 0, 0, 100);
-    text(`Round: ${this.round}`, panelX + 27, panelY + 152);
+    text(`Round: ${this.round}`, panelX + 102, panelY + 188);
     fill(255);
-    text(`Round: ${this.round}`, panelX + 25, panelY + 150);
+    textSize(60);
+    text(`🏁`, panelX + 15, panelY + 188);
+    textSize(40);
+    text(`Round: ${this.round}`, panelX + 100, panelY + 186);
     pop();
 
     textAlign(LEFT, BASELINE);
