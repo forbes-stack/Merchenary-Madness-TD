@@ -61,32 +61,39 @@ class CannonTower extends Tower {
       impactSize: 7
     };
   }
+draw() {
+  this._drawShotTracer();
 
-  draw() {
-    // draw tracer first
-    this._drawShotTracer();
+  push();
+  imageMode(CENTER);
 
-    // draw splash AoE circle if active
-    if (this._splashTimer > 0) {
-    push();
-    noStroke();
-    fill(50, 140, 255, 60); // soft, light blue
-    circle(this._splashX, this._splashY, this.splashRadius * 2);
-    pop();
+  if (!this.target) {
+    image(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0);
+  } else {
+    let dx = this.target.x - this.x;
+    let dy = this.target.y - this.y;
 
-    this._splashTimer--;
+    if (Math.abs(dx) > Math.abs(dy)) {
+      if (dx > 0)
+        image(cannonTowerImg, this.x, this.y, 80, 80, 200, 0, 200, 0); // right
+      else
+        image(cannonTowerImg, this.x, this.y, 80, 80, 410, 0, 225, 0); // left
+    } else {
+      if (dy < 0)
+        image(cannonTowerImg, this.x, this.y, 50, 60, 100, 0, 110, 0);  // back
+      else
+        image(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0); // front
     }
+  }
+    pop();
+  }
 
-    // body (triangle)
+  drawSelection() {
     push();
-    fill(0, 0, 200);
-    noStroke();
-    const r = 18;
-    triangle(
-      this.x, this.y - r,
-      this.x - r, this.y + r * 0.5,
-      this.x + r, this.y + r * 0.5
-    );
+    noFill();
+    stroke(255);
+    strokeWeight(1);
+    circle(this.x, this.y, this.range * 2);
     pop();
   }
 

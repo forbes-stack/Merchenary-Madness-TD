@@ -16,27 +16,39 @@ class SniperTower extends Tower {
   }
 
   draw() {
-    // draw tracer first
     this._drawShotTracer();
 
-    // body
     push();
-    fill(150, 0, 0);
-    noStroke();
-   fill(255, 200, 0);
-    noStroke();
-    beginShape();
-    vertex(this.x, this.y - 15);
-    vertex(this.x - 15, this.y);
-    vertex(this.x, this.y + 15);
-    vertex(this.x + 15, this.y);
-    endShape(CLOSE);
+    imageMode(CENTER);
 
-    // // range ring
-    // noFill();
-    // stroke(0, 150, 0, 50);
-    // strokeWeight(1);
-    // circle(this.x, this.y, this.range * 2);
+    if (!this.target) {
+      image(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0);
+    } else {
+      let dx = this.target.x - this.x;
+      let dy = this.target.y - this.y;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0)
+          image(sniperTowerImg, this.x, this.y, 80, 80, 225, 0, 175, 0); // right
+        else
+          image(sniperTowerImg, this.x, this.y, 110, 80, 380, 0, 225, 0); // left
+      } else {
+        if (dy < 0)
+          image(sniperTowerImg, this.x, this.y, 60, 80, 0, 0, 125, 0); // back
+        else
+          image(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0); // front
+      }
+    }
+
+    pop();
+  }
+
+  drawSelection() {
+    push();
+    noFill();
+    stroke(255);
+    strokeWeight(1);
+    circle(this.x, this.y, this.range * 2);
     pop();
   }
 
@@ -52,7 +64,7 @@ class SniperTower extends Tower {
     pop();
   }
 
-  update(enemies, infoTracker) {
+  snip(enemies, infoTracker) {
   if (!enemies || enemies.length === 0) return;
   if (this.cooldown > 0) { this.cooldown--; return; }
 

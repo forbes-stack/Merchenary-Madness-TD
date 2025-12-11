@@ -17,27 +17,37 @@ class GatlingGunTower extends Tower {
   }
 
   draw() {
-    // draw tracer first
     this._drawShotTracer();
 
-    // body
     push();
-    fill(0, 150, 0);
-    noStroke();
-    circle(this.x, this.y, 30);
+    imageMode(CENTER);
 
-    // // range ring
-    // noFill();
-    // stroke(0, 150, 0, 50);
-    // strokeWeight(1);
-    // circle(this.x, this.y, this.range * 2);
+    if (!this.target) {
+      image(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0);
+    } else {
+      let dx = this.target.x - this.x;
+      let dy = this.target.y - this.y;
+
+      if (Math.abs(dx) > Math.abs(dy)) {
+        if (dx > 0)
+          image(gatlingTowerImg, this.x, this.y, 80, 70, 200, 0, 200, 0); // right
+        else
+          image(gatlingTowerImg, this.x, this.y, 80, 70, 400, 0, 225, 0); // left
+      } else {
+        if (dy < 0)
+          image(gatlingTowerImg, this.x, this.y, 80, 70, 100, 0, 100, 0); // back
+        else
+          image(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0); // front
+          
+      }
+    }
+
     pop();
   }
-
-  drawGhost() {
+  drawSelection() {
     push();
     noFill();
-    stroke(0, 150, 0, 60);
+    stroke(255);
     strokeWeight(1);
     circle(this.x, this.y, this.range * 2);
     pop();

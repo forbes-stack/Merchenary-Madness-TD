@@ -1,11 +1,15 @@
 class TowerDragger {
-  constructor(towerTypes, dropZone) {
+  constructor(towerTypes, dropZone, towerImages={}) {
     this.towerTypes = towerTypes;
     this.draggingTower = null;
     this.dropZone = dropZone;
     this._dragCost = 0;
     this.draggingTowerType = null; // Keep track of the type
     this._towerRadius = 15;
+    this.cowboyTower = towerImages.cowboyTower;
+    this.cannonTowerImg = towerImages.cannonTowerImg;
+    this.sniperTowerImg = towerImages.sniperTowerImg;
+    this.gatlingTowerImg = towerImages.gatlingTowerImg;
   }
 
   startDrag(towerType, startX, startY) {
@@ -157,31 +161,23 @@ class TowerDragger {
 
     // Draw correct shape based on type
 if (this.draggingTowerType === "cannon") {
-  let r = 18;
-  triangle(
-    t.x, t.y - r,
-    t.x - r, t.y + r * 0.5,
-    t.x + r, t.y + r * 0.5
-  );
+  imageMode(CENTER);
+  image(cannonTowerImg, t.x, t.y, 50, 70, 0, 0, 100, 0);
 
 } else if (this.draggingTowerType === "sniper") {
   // Diamond shape (same as sniper tower)
-  const r = 15;
-  beginShape();
-  vertex(t.x,       t.y - r);
-  vertex(t.x - r,   t.y);
-  vertex(t.x,       t.y + r);
-  vertex(t.x + r,   t.y);
-  endShape(CLOSE);
+  imageMode(CENTER);
+  image(sniperTowerImg, t.x, t.y, 60, 80, 110, 0, 140, 0);
 
-} else {
-  // Gatling + Basic are circles
-  circle(t.x, t.y, 30);
+} else if (this.draggingTowerType == "basic") {
+    imageMode(CENTER);
+    image(cowboyTower, t.x,t.y,40,60,200,0,100,0)
+} 
+
+else if (this.draggingTowerType == "gatling") {
+  imageMode(CENTER);
+  image(gatlingTowerImg, t.x, t.y, 50, 80, 0, 0, 100, 0);
 }
-
-
     pop();
-
-
   }
 }

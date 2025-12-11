@@ -1,4 +1,5 @@
 // Tower.js
+
 class Tower {
   constructor(x, y, range, damage, rate, towerType) {
     this.x = x;
@@ -106,6 +107,10 @@ class Tower {
       this._lastShotX = target.x;
       this._lastShotY = target.y;
       this._shotTimer = this._shotDuration;
+
+      this.target = target
+    } else {
+      this.target = null;
     }
   }
 
@@ -113,16 +118,35 @@ class Tower {
     // draw tracer first
     this._drawShotTracer();
 
-    // body
-    push();
-    imageMode(CENTER);
-    image(cowboyTower, this.x, this.y)
-pop();
+  push();
+  imageMode(CENTER);
+
+ if (!this.target) {
+  // front
+  image(cowboyTower, this.x, this.y, 40, 60, 200, 0, 100, 0);
+} else {
+  let dx = this.target.x - this.x;
+  let dy = this.target.y - this.y;
+
+  if (Math.abs(dx) > Math.abs(dy)) {
+    if (dx > 0)
+      image(cowboyTower, this.x, this.y, 80, 60, 450, 0, 225, 0); // right
+    else
+      image(cowboyTower, this.x, this.y, 60, 60, 300, 0, 125, 0); // left
+  } else {
+    if (dy < 0)
+      image(cowboyTower, this.x, this.y, 60, 60, 20, 0, 150, 0);  // back
+    else
+      image(cowboyTower, this.x, this.y, 40, 60, 200, 0, 100, 0); // front
+  }
+}
+
+  pop();
     // // range
     noFill();
     // stroke(0, 0, 255, 50);
     // circle(this.x, this.y, this.range * 2);
-  }
+}
 
   drawGhost() {
     push();
@@ -141,7 +165,8 @@ pop();
     noFill();
     stroke(255);
     strokeWeight(2);
-    circle(this.x, this.y, 35); // Selection ring
+    imageMode(CENTER)
+    image(cowboyTower, this.x,this.y,40,60,200,0,100,0) // Selection ring
 
     stroke(255, 255, 255, 100);
     strokeWeight(1);

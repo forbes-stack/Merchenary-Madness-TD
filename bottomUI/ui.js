@@ -25,9 +25,13 @@ class UI {
     ];
 
     this.placedTowers = [];
+    this.cowboyTower = assets.cowboyTower;
+    this.sniperTowerImg = assets.sniperTowerImg;
+    this.cannonTowerImg = assets.cannonTowerImg;
+    this.gatlingTowerImg = assets.gatlingTowerImg;
 
     // Drag helper (expects TowerDragger to be loaded)
-    this.dragger = new TowerDragger(this.towerTypes, this.dropZone);
+    this.dragger = new TowerDragger(this.towerTypes, this.dropZone, {cowboyTower, cannonTowerImg, sniperTowerImg, gatlingTowerImg});
 
     this.bg = assets.bg;
     this.uiBg = assets.uiBg;
