@@ -15,12 +15,8 @@
 // }
 
 let start_button, 
-    settings_button,
-    settings_header,
-    settings_body,
     img, 
     mousePress = false, 
-    settingsLoaded = false, 
     mapLoaded = false
     
 
@@ -34,7 +30,6 @@ let start_button,
 
 function preload() { 
   img = loadImage('assets/start.png') 
-  img2 = loadImage('assets/settings_bg.png')
   img3 = loadImage('assets/home.png')
 } 
 
@@ -48,13 +43,6 @@ function setup() {
   start_button.position(CENTER, 350); 
   styleButton(start_button)
   
-  
-  settings_button = createButton("Settings"); 
-  
-  settings_button.size(300, 100); 
-  settings_button.position(CENTER, 500) 
-  styleButton(settings_button)
-  
 } 
 
 function draw() { 
@@ -64,17 +52,8 @@ function draw() {
     image(img, 0, 0)
   } 
 
-  if (page == 'settings') {
-    image(img2, 0, 0)
-    image(img3, 0,0,100,100)
-  }
-
   
   //Actual Page Changing
-
-  // Once you hit Start/Settings, the page var will change to map/settings,
-  //leading to (Step 1), which will then call loadScript() and load the scripts
-  //corresponding to 
 
   //(Step 1)
   if (page === 'map' && !mapLoaded) { 
@@ -85,19 +64,6 @@ function draw() {
       mapSetup(); 
     }); 
   }
-  
-  //(Step 1)
-  if (page === 'settings' && !settingsLoaded) { 
-    loadScript(['pages/settings.js'], () => { 
-      settingsLoaded = true;
-      
-    }); 
-  } 
-  
-  //(Step 3 for settings)
-  if (page == 'settings' && settingsLoaded) { 
-    settingsDraw(); 
-  } 
 
   if (page == 'map' && mapLoaded == true) {
     mapDraw();
@@ -128,22 +94,8 @@ function mousePressed() {
   if (page === 'home') {
     if (mouseX >= 220 && mouseX <= 550 && mouseY >= 300 && mouseY <= 400) {
       start_button.hide();
-      settings_button.hide();
       page = 'map';
       console.log('page is map');
-    }
-    if (mouseX >= 220 && mouseX <= 550 && mouseY >= 450 && mouseY <= 550) {
-      start_button.hide();
-      settings_button.hide();
-      page = 'settings';
-      console.log('page is settings');
-    }
-  }
-  else if (page == 'settings') {
-    if (mouseX >= 0 && mouseX <= 100 && mouseY >= 0 && mouseY <= 100) {
-      setup()
-      page = 'home'
-      console.log('page is home')
     }
   }
   else if (page == 'map') {
@@ -151,7 +103,7 @@ function mousePressed() {
   }
 }
 
-//styles each button on startpage
+//styles button on startpage
 function styleButton(btn) {
   btn.style('font-size', '50px');
   btn.style('color', 'green');

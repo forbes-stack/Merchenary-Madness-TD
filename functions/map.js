@@ -55,8 +55,9 @@ function mapPreload() {
   cannonTowerImg = loadImage("assets/cannon_tower1.png")
 
   //Enemies
-  fastEnemyImg = loadImage("fast_enemy.png");
-  basicEnemyImg = loadImage("basic_enemy.png");
+  fastEnemyImg = loadImage("assets/fast_enemy.png");
+  basicEnemyImg = loadImage("assets/basic_enemy.png");
+  tankEnemyImg = loadImage("assets/tank_enemy.png")
 }
 
 
