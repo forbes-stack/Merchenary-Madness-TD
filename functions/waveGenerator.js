@@ -36,7 +36,7 @@ class WaveManager {
     // Basic enemies: Always spawn, moderate growth.
     let basicCount;
     if (roundNumber <= 5) {
-      basicCount = 5 + ((roundNumber - 1) * 3);
+      basicCount = 2 + ((roundNumber - 1) * 3);
     } else {
       basicCount = 17 + ((roundNumber - 5) * 10);
     }
