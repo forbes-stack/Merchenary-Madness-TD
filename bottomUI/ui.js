@@ -258,19 +258,7 @@ class UI {
       [625, 570],
       [800, 570],
     ];
-    /**
-     * OLD BOXES
-    const boxes = [
-      [50, 525],
-      [200, 525],
-      [350, 525],
-      [500, 525],
-      [650, 525],
-    ];
-     */
-    for (let [x, y] of boxes) {
-      rect(x, y, 100, 100);
-    }
+   
 
     // Palette icons
     for (let slot of this.paletteSlots) {
