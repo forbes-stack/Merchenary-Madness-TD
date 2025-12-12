@@ -83,14 +83,14 @@ if(!this.alive) return;
     pop();
   }
 
-takeDamage(amount, infoTracker) {
-  if (!this.alive) return;
+  takeDamage(amount, infoTracker) {
+    if (!this.alive) return;
 
-  this.health -= amount;
+    this.health -= amount;
 
-  if(this.health <= 0) {
-    this.alive = false;
-    infoTracker.addCurrency(this.currency); // kill reward for enemy
+    if(this.health <= 0) {
+      this.alive = false;
+      infoTracker.addCurrency(this.currency); // kill reward for enemy
+    }
   }
-}
 }

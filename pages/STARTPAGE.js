@@ -21,10 +21,13 @@ let start_button,
     
 
     //each js script for map.js
-    sources = ['functions/map.js', 'functions/waveGenerator.js', 'enemies/enemy.js', 'bottomUI/ui.js', 'bottomUI/infoTracker.js',
-               'towers/tower.js', 'functions/towerDragger.js',
-               'functions/path.js', 'enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
-               'towers/gatlingTower.js', 'towers/cannonTower.js', 'towers/sniperTower.js', 'functions/upgradeManager.js'
+    sources = ['enemies/enemy.js','enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js', 
+                'towers/tower.js','towers/gatlingTower.js', 'towers/cannonTower.js', 'towers/sniperTower.js',
+                'functions/path.js', 'functions/towerDragger.js','functions/upgradeManager.js',
+                'bottomUI/ui.js', 'bottomUI/infoTracker.js',
+                'functions/waveGenerator.js',
+                'functions/map.js'
+              
               ]
     page = 'home'; 
 

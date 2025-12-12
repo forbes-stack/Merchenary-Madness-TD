@@ -38,6 +38,7 @@ class fastEnemy extends Enemy {
     if (this.direction == "up") {
       if (this.frame < 30) {
         image(fastEnemyImg, x, y, 50, 100, 0, 170, 100, 0);
+        
       } else {
         image(fastEnemyImg, x, y, 50, 100, 100, 170, 100, 0);
       }
