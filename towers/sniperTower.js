@@ -64,7 +64,7 @@ class SniperTower extends Tower {
     pop();
   }
 
-  snip(enemies, infoTracker) {
+  update(enemies, infoTracker) {
   if (!enemies || enemies.length === 0) return;
   if (this.cooldown > 0) { this.cooldown--; return; }
 
@@ -77,7 +77,7 @@ class SniperTower extends Tower {
     const d = dist(this.x, this.y, enemy.x, enemy.y);
 
     // enemy must NOT be inside the minimum range
-    if (d > this.range) continue;
+    if (d < this.range) continue;
 
     // choose the enemy furthest along the path
     if (enemy.pathIndex > furthestProgress) {
