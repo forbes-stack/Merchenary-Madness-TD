@@ -1,6 +1,6 @@
 class basicEnemy extends Enemy {
   constructor(path) {
-    super(path, 1, 100, 1);
+    super(path, 1, 100, 5);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // which walking frame
   }

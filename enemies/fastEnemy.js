@@ -1,6 +1,6 @@
 class fastEnemy extends Enemy {
   constructor(path) {
-    super(path, 3, 25, 1);
+    super(path, 3, 30, 2);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // frame cycle for walking animation
   }

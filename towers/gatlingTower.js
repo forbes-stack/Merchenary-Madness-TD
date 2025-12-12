@@ -1,7 +1,7 @@
 class GatlingGunTower extends Tower {
   constructor(x, y) {
     // Pass 'gatling' as the towerType
-    super(x, y, 100, 3, 0.1, 'gatling'); // <--- Updated super call
+    super(x, y, 100, 7, 0.1, 'gatling'); // <--- Updated super call
     this._shotDuration = 5;   // shorter beam so it doesn't look like a solid line
     this.maxLevel = 3; // Max level for Gatling is 3
   }

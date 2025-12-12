@@ -1,12 +1,12 @@
 class CannonTower extends Tower {
   constructor(x, y) {
     // Pass 'cannon' as the towerType
-    super(x, y, 150, 50, 2.0, 'cannon'); // range, damage, rate, type
+    super(x, y, 120, 30, 1.5, 'cannon'); // range, damage, rate, type
     this._shotDuration = 12;   // lingers longer to emphasize the big hit
     this.maxLevel = 4;         // Max level for Cannon is 4
 
     // Splash properties
-    this.splashRadius = 60;    // visual + damage radius
+    this.splashRadius = 90;    // visual + damage radius
     this._splashDuration = 12; // how many frames the AoE circle is visible
     this._splashTimer = 0;
     this._splashX = 0;
@@ -31,7 +31,7 @@ class CannonTower extends Tower {
     }
 
     // --- Splash to nearby enemies (half damage) ---
-    const splashDamage = Math.floor(this.damage / 2);
+    const splashDamage = Math.floor(this.damage / 1.2);
 
     for (let enemy of allEnemies) {
       if (!enemy || !enemy.alive) continue;
