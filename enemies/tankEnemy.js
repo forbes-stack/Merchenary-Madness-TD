@@ -34,7 +34,7 @@ class tankEnemy extends Enemy {
 
     let x = this.x;
     let y = this.y;
-    
+
 
     // Walking backward (up)
     if (this.direction == "up") {

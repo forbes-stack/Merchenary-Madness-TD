@@ -1,6 +1,6 @@
 class basicEnemy extends Enemy {
   constructor(path) {
-    super(path, 1, 100, 5);
+    super(path, 1, 100, 1);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // which walking frame
   }
@@ -30,7 +30,7 @@ class basicEnemy extends Enemy {
 
   drawBody() {
     push();
-    imageMode(CENTER); 
+    imageMode(CENTER);
 
     let x = this.x;
     let y = this.y;

@@ -1,6 +1,6 @@
 class fastEnemy extends Enemy {
   constructor(path) {
-    super(path, 3, 30, 2);
+    super(path, 3, 30, 1);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // frame cycle for walking animation
   }
@@ -38,7 +38,7 @@ class fastEnemy extends Enemy {
     if (this.direction == "up") {
       if (this.frame < 30) {
         image(fastEnemyImg, x, y, 50, 100, 0, 170, 100, 0);
-        
+
       } else {
         image(fastEnemyImg, x, y, 50, 100, 100, 170, 100, 0);
       }
