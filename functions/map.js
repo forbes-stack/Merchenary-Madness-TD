@@ -16,9 +16,13 @@ let enemy2;
 //Buttons
 let startWaveButton;
 let pauseButton;      // pause icon button
-let speedButton;      // 1x / 2x toggle (SpeedButton.js)
+let speedButton;      // 1x / 2x / 3x speed button (SpeedButton.js)
 let gameSpeed = 1;    // game steps per frame, set by speedButton
 let isPaused = false; // pause flag
+
+// Top-right controls, in canvas coordinates (filled in by mapSetup once width is known):
+// Pause sits in the corner, the speed button left of it, Start Wave left of that.
+let TOP_CONTROLS = null;
 let settingsOpen = false; // Settings panel open from the pause menu
 let tutorial;         // guided first round (tutorial.js)
 let showStats = false; // FPS / entity overlay, toggled with the F key
@@ -141,14 +145,20 @@ function mapSetup() {
   info = new InfoTracker(100, 0);
 
   // Create Pause + Start Wave buttons
+  const margin = 15;
+  const pause = { x: width - margin - 80, y: margin, w: 80, h: 80 };
+  const speed = { x: pause.x - 10 - 100, y: margin, w: 100, h: 80 };
+  const startWave = { x: speed.x - 12 - 130, y: margin + 20, w: 130, h: 40 };
+  TOP_CONTROLS = { pause, speed, startWave };
+
   createTopButtons();
 
-  // 1x / 2x speed toggle, drawn on the canvas just left of the Pause button
-  speedButton = new SpeedButton(width - 320, 40, 50, 40);
+  // 1x / 2x / 3x speed button, drawn on the canvas just left of the Pause button
+  speedButton = new SpeedButton(speed.x, speed.y, speed.w, speed.h);
 
   // the strip behind the speed / Pause / Start Wave controls: no towers there,
   // and tower menus don't open underneath it
-  ui.reservedRects.push({ x: width - 325, y: 0, w: 255, h: 85 });
+  ui.reservedRects.push({ x: startWave.x - 5, y: 0, w: width - startWave.x + 5, h: pause.y + pause.h + 10 });
 
   // Wave manager, but DO NOT auto-start the first wave
   waveManager = new WaveManager(path);
@@ -385,14 +395,13 @@ function touchEnded(e) {
  * with some breathing room from the corner.
  */
 function createTopButtons() {
-  const buttonHeight = 40;
 
   // --- Pause icon button (left of Start Wave) ---
   pauseButton = createButton("⏸"); // Unicode pause icon
   pauseButton.style("background-color", "#444");
   pauseButton.style("color", "white");
-  pauseButton.style("border", "2px solid #222");
-  pauseButton.style("border-radius", "8px");
+  pauseButton.style("border", "3px solid #222");
+  pauseButton.style("border-radius", "16px");
   pauseButton.style("cursor", "pointer");
   pauseButton.mousePressed(() => {
     if (!info.isGameOver) {
@@ -416,13 +425,9 @@ function createTopButtons() {
   });
 
   // Placed in canvas coordinates; canvasLayout scales them with the canvas
-  const topY = 40;
-
-  // Base X a bit away from the right edge so nothing feels crammed
-  const baseX = width - 260; // left-most button x
-
-  canvasLayout.place(pauseButton, baseX, topY, 40, buttonHeight, 20);
-  canvasLayout.place(startWaveButton, baseX + 50, topY, 130, buttonHeight, 16);  // moved left vs old width-130
+  const { pause, startWave } = TOP_CONTROLS;
+  canvasLayout.place(pauseButton, pause.x, pause.y, pause.w, pause.h, 40);
+  canvasLayout.place(startWaveButton, startWave.x, startWave.y, startWave.w, startWave.h, 16);
 }
 
 /**
@@ -442,8 +447,7 @@ function restartGame() {
 
   // Clear pause state and go back to normal speed
   isPaused = false;
-  speedButton.isFast = false;
-  gameSpeed = 1;
+  speedButton.reset();
 
   // Reset WaveManager and start fresh, waiting for player again
   waveManager = new WaveManager(path);

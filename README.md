@@ -23,7 +23,7 @@ Built with [p5.js](https://p5js.org/) and plain JavaScript.
 | Select, upgrade, or sell a tower | Click the tower |
 | Start the next wave | **Start Wave** button |
 | Pause / resume | **⏸** button or the **P** key |
-| Game speed | **1x / 2x** button |
+| Game speed | **1x / 2x / 3x** button (click to cycle) |
 | Change a tower's target | **Target** button in the tower's menu (First, Near, Far, Strong, Weak) |
 | Performance overlay | **F** key |
 | Restart or Quit to Title | From the pause menu or the Game Over screen |

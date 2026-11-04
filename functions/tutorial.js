@@ -67,7 +67,8 @@ class Tutorial {
       this.drawRing(290, 400);
     } else if (this.step === "start") {
       message = "Nice shot! Now press Start Wave to send in the outlaws.";
-      this.drawArrow(width - 145, 84, "up");
+      const sw = TOP_CONTROLS.startWave;
+      this.drawArrow(sw.x + sw.w / 2, sw.y + sw.h + 4, "up");
     } else if (this.step === "select") {
       message = "Click your tower to open its menu.";
       const t = ui.placedTowers[0];

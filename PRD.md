@@ -199,7 +199,7 @@ Before optimizing, a 365-enemy frame spent 51.6 ms drawing enemies: ~46 µs per 
 | X-2 | Towers have limited ammo the player must reload | Missing | |
 | X-3 | Western background music | Done | A looping tune in A minor (oom-pah bass, galloping hoofbeats, whistled melody), synthesized live. Starts with the game, stops on Game Over, restarts on Restart. Keeps playing while paused. |
 | X-4 | More sound effects | Done | All synthesized in `functions/soundFX.js` (Web Audio, no sound files): a shot per tower (revolver, Gatling, cannon, sniper), place / upgrade / sell, enemy killed, Dynamite explosion, enemy escaped, wave start bugle, wave cleared jingle, Game Over. Repeated sounds are rate-limited so rapid fire and big waves stay listenable. Audio starts on the first click (browser autoplay rules). |
-| X-5 | Game speed control | Done | A **1x/2x** toggle left of the Pause button (`functions/SpeedButton.js`). 2× runs the game logic twice per frame, so movement, spawns, and tower fire all speed up evenly. Restart returns to 1×. 5× was dropped by design. |
+| X-5 | Game speed control | Done | A speed button left of the Pause button cycles **1x → 2x → 3x** (`functions/SpeedButton.js`). Faster speeds run the game logic 2 or 3 times per frame, so movement, spawns, and tower fire all speed up evenly. Restart returns to 1×. 5× was dropped by design. Measured: a full round-14 wave (365 enemies) with 12 towers runs at 20 ms per frame at 3× (about 50 FPS). |
 | X-6 | A shop between rounds (more revolver ammo, more cannonballs) | Missing | Depends on X-2 |
 | X-7 | Curved paths for enemies | Missing | Paths are straight segments. One diagonal section uses a fixed slope in `Enemy.move()` that only works for that angle. |
 

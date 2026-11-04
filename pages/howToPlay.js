@@ -82,7 +82,7 @@ function howToPlayDraw() {
     '• Drag mercenaries onto open ground. You have 5 tower slots; buy more in the bottom bar.',
     '• Start Wave sends the next wave. Clearing a wave pays a bonus that grows each round.',
     '• Click a tower for its ring menu: ⚔ damage, ⏱ rate (pick one path), ◎ target, $ sell for half.',
-    '• ⏸ or P pauses  ·  1x/2x changes game speed  ·  F shows FPS',
+    '• ⏸ or P pauses  ·  1x/2x/3x changes game speed  ·  F shows FPS',
   ]
   controls.forEach((line, i) => text(line, 40, 175 + i * 21))
 
