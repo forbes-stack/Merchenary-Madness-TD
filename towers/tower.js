@@ -62,7 +62,7 @@ class Tower {
   applyDamage(mainTarget, allEnemies, infoTracker) {
     if (!mainTarget || !mainTarget.alive) return;
     if (typeof mainTarget.takeDamage === "function") {
-      mainTarget.takeDamage(this.damage, infoTracker);
+      mainTarget.takeDamage(this.damage, infoTracker, this);
     }
   }
 

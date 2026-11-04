@@ -32,7 +32,7 @@ You start with **125 gold**, **100 health**, and room for **5 towers**. Need mor
 
 New to the game? A short guided tutorial runs during your first round, and **How to Play** on the title screen covers every tower and outlaw.
 
-**Settings** (on the title screen) has volume sliders for master, sound effects, and music, plus a color-blind mode (Protanopia, Deuteranopia, Tritanopia). Your choices are remembered in your browser.
+**Settings** (on the title screen, or in the pause menu mid-game) has volume sliders for master, sound effects, and music, plus a color-blind mode (Protanopia, Deuteranopia, Tritanopia). Your choices are remembered in your browser.
 
 ---
 
@@ -49,8 +49,8 @@ New to the game? A short guided tutorial runs during your first round, and **How
 
 Each mercenary has two upgrade paths with three levels each:
 
-- **Damage:** hits harder ($60 → $80 → $100)
-- **Rate:** fires faster ($40 → $60 → $80)
+- **Damage:** hits harder ($60 → $180 → $300)
+- **Rate:** fires faster ($50 → $100 → $250)
 
 Click a placed tower to open its menu: a ring of buttons around it for ⚔ damage, ⏱ rate, ◎ targeting, and $ sell. Hover a button to see what it does.
 
@@ -74,9 +74,9 @@ Selling a tower refunds **half** of everything you spent on it.
 **Special outlaws:**
 
 - **Dynamite** blows apart into 3 Runners when you take him out.
-- **Ghost** is camouflaged. Only Snipers can see him, and so can any tower placed near a Sniper. Cannon blasts still catch him in the splash.
+- **Ghost** is camouflaged. Only Snipers can see him, and so can any tower placed near a Sniper. Cannon splash passes right through him, so you need towers that can see him.
 - **Doc** patches himself up as he walks, so damage that doesn't finish him off wears away.
-- **Ironclad** wears plate armor that shrugs off 5 damage from every hit. Rapid-fire guns barely scratch him.
+- **Ironclad** wears plate armor that bullets just clink off. **Only Cannons can hurt him** (direct hits and splash), and even those lose 5 damage to the armor. Other towers will waste their shots on him.
 
 Waves grow bigger and spawn faster each round, and every 5 rounds (5, 10, 15, ...) all outlaws get tougher and quicker: +50% health and +30% speed each time.
 

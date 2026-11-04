@@ -28,9 +28,9 @@
 | F-1.1.1 | A start screen shows the game title and a **Start** button. | Done | `pages/STARTPAGE.js` with `assets/start.png` |
 | F-1.1.2 | Pressing Start loads the game map without reloading the page. | Done | Game scripts are injected in order, then images load, then `mapSetup()` runs. A loading message shows meanwhile, and a load failure is shown on screen. |
 | F-1.1.3 | Waves only start when the player presses **Start Wave**. | Done | The button is hidden while a wave is still spawning, while paused, and on game over. It reappears once the current wave has finished spawning, so the player may intentionally send the next wave early (no bonus for doing so). |
-| F-1.1.4 | The player can pause and resume with a pause button or the **P** key. | Done | The pause overlay has **Resume** and **Restart** |
+| F-1.1.4 | The player can pause and resume with a pause button or the **P** key. | Done | The pause overlay has **Resume**, **Restart**, **Settings**, and **Quit to Title** |
 | F-1.1.5 | When health reaches 0 a **Game Over** overlay appears with a **Restart** button. | Done | Restart resets health, gold, and round and removes all towers and enemies |
-| F-1.1.6 | A settings screen with volume controls. | Done | **Settings** button on the start screen (start screen only). Master / Sound Effects / Music sliders and a color-blind mode selector. Settings are saved in the browser (`localStorage`) and fall back to defaults if storage is blocked. |
+| F-1.1.6 | A settings screen with volume controls. | Done | **Settings** button on the start screen and in the pause menu (the same panel, centered over the paused game; Back returns to where it was opened). Master / Sound Effects / Music sliders, color-blind mode selector, and tutorial replay. Changes apply immediately, also mid-game. Settings are saved in the browser (`localStorage`) and fall back to defaults if storage is blocked. |
 | F-1.1.7 | A return-to-home screen. | Done | **Quit to Title** (with the `home.png` house icon) in the pause menu and on the Game Over screen. It reloads the page, which resets the game cleanly; settings are kept. |
 | F-1.1.8 | A How to Play screen. | Done | **How to Play** button on the title screen: goal, controls, all 4 towers, and all 7 outlaws with their abilities (`pages/howToPlay.js`) |
 
@@ -70,7 +70,7 @@ Rate is the time between shots (the game runs at 60 frames per second). Footprin
 |---|---|---|---|---|---|---|
 | Cowboy (basic) | $25 | 120 px | 15 | 0.5 s | 14 px | None |
 | Gatling | $45 | 100 px | 7 | 0.1 s | 20 px | Rapid fire |
-| Cannon | $70 | 120 px | 30 | 1.5 s | 24 px | Splash: enemies within 90 px of the target take half damage (15) |
+| Cannon | $70 | 120 px | 30 | 1.5 s | 24 px | Splash: enemies within 90 px of the target take half damage minus 5 (10 at base; 17 / 51 / 164 at damage-upgrade levels 1 / 2 / 3). Camo (Ghost) is never hit by splash. |
 | Sniper | $85 | Unlimited (min 60 px) | 75 | 3 s | 16 px | Cannot hit enemies closer than 60 px |
 
 #### 1.4.2 Requirements
@@ -82,7 +82,7 @@ Rate is the time between shots (the game runs at 60 frames per second). Footprin
 | F-1.4.3 | Towers are placed by dragging from the palette to the map. | Done | |
 | F-1.4.4 | Clicking a placed tower selects it, shows its range, and opens its upgrade menu. | Done | The menu is a ring of four round icon buttons around the tower: ⚔ upgrade damage (top), ⏱ upgrade rate (right), ◎ targeting mode (left), $ sell (bottom). Each shows its price or state underneath (🔒 Locked / ★ MAX on the button itself), and hovering shows a short label. Near edges and corners the buttons fan out toward the middle of the map instead (half circle, quarter circle, or a straight line), so they always stay on screen, never overlap, and never sit under the top-right controls (checked at every placeable spot for all 4 towers). Clicking empty ground deselects. |
 | F-1.4.5 | Each tower has two upgrade paths: **Damage** and **Rate**. | Done | Both paths have 3 levels |
-| F-1.4.6 | Upgrade costs | Done | Damage: $60 / $80 / $100 (×1.5 / ×2.5 / ×3.0 damage, compounding). Rate: $40 / $60 / $80 (×0.80 / ×0.60 / ×0.50 time between shots, compounding). All towers share the same upgrade tables. |
+| F-1.4.6 | Upgrade costs | Done | Damage: $60 / $180 / $300 (×1.5 / ×2.5 / ×3.0 damage, compounding). Rate: $50 / $100 / $250 (×0.80 / ×0.60 / ×0.50 time between shots, compounding). All towers share the same upgrade tables. |
 | F-1.4.7 | Buying the first upgrade on one path locks the opposite path. | Done | A tower follows a single path for all 3 levels |
 | F-1.4.8 | Towers can be sold. | Done | Refund is 50% of the total spent (purchase plus upgrades) |
 | F-1.4.9 | Towers differ in size. | Done | Each tower has its own footprint (see table) for placement spacing and click area |
@@ -106,14 +106,14 @@ Speed is in pixels per frame.
 | Doc (regen) | 200 | 0.8 | 8 | Round 11 |
 | Ironclad (armored) | 300 | 0.7 | 12 | Round 14 |
 
-**Economy (rebalanced after playtesting):** start with $125; towers $25–$85; upgrades $40–$100; bounties above; wave clear $20 + $3 × round. If every enemy is killed, income per wave is about $38 (round 1), $60 (2), $82 (3), $114 (4), $208 (5), and $701 (10), so early on the player can afford roughly one new tower or upgrade per wave.
+**Economy (rebalanced after playtesting):** start with $125; towers $25–$85; upgrades: damage $60 / $180 / $300, rate $50 / $100 / $250; bounties above; wave clear $20 + $3 × round. If every enemy is killed, income per wave is about $38 (round 1), $60 (2), $82 (3), $114 (4), $208 (5), and $701 (10), so early on the player can afford roughly one new tower or upgrade per wave.
 
 Special abilities:
 
 - **Dynamite:** when killed by a tower, bursts into 3 Fast enemies at the spot where it died. They belong to the same wave (the wave payout waits for them) and get the same stat boosts. No split if it escapes.
-- **Ghost:** camo. Only Snipers, and any tower within 150 px of a Sniper (spotter range), can target it. Cannon splash still damages it. Drawn semi-transparent.
+- **Ghost:** camo. Only Snipers, and any tower within 150 px of a Sniper (spotter range), can target it. Cannon splash does **not** hit it; only direct hits from towers that can see it. Drawn semi-transparent.
 - **Doc:** heals 10 health per second (per game step, so faster at 2×), up to its max. Heals only itself.
-- **Ironclad:** armor 5. Every hit does 5 less damage, minimum 1 (Gatling 7 → 2, Cannon splash 15 → 10).
+- **Ironclad:** only **Cannons** can hurt it, with direct hits or splash. Its armor still takes 5 off every Cannon hit, minimum 1 (direct 30 → 25, splash 10 → 5). Cowboys, Gatlings, and Snipers still target and shoot it, but their shots do nothing: a metal "clink" plays and an occasional "IMMUNE" popup shows, so Ironclads also waste other towers' fire.
 
 The four special enemies use the standard sprite grid (`enemies/gridEnemy.js`: 2 walk frames × 4 directions, 120×200 cells). They are drawn at 29×48 px so the figures are ~41 px tall, the same height as the original three enemies (in their natural, slimmer proportions). Their sheets were generated with `tools/gen_sprites.js`.
 
@@ -143,7 +143,7 @@ The formulas below use a **difficulty round** `d = round + 1`, so wave 1 uses th
 | F-1.5.7 | Special enemy: **Explosive** | Done | Dynamite: splits into 3 Fast enemies when killed |
 | F-1.5.8 | Special enemy: **Camo** (only some towers can see it) | Done | Ghost: Snipers and towers within 150 px of a Sniper |
 | F-1.5.9 | Special enemy: **Regen** (heals over time) | Done | Doc: 10 health per second |
-| F-1.5.10 | Enemies with armor that reduces incoming damage (like metal balloons) | Done | Ironclad: −5 damage per hit, minimum 1 |
+| F-1.5.10 | Enemies with armor that reduces incoming damage (like metal balloons) | Done | Ironclad: immune to everything but Cannons (direct + splash), and −5 armor per Cannon hit, minimum 1 |
 | F-1.5.11 | Waves get harder as rounds increase. | Done | See wave generation |
 
 ---
@@ -179,7 +179,7 @@ Before optimizing, a 365-enemy frame spent 51.6 ms drawing enemies: ~46 µs per 
 |---|---|---|---|
 | NF-2.2.1 | Buttons and menus are clearly labeled and sized for mouse and touch. | Done | The game scales to fit any window (up to 2×) with its buttons, sliders, and menus scaled to match (`functions/layout.js`), so there is no scrolling on laptops. Touch: tap = click, drag = place a tower; touches on the canvas don't scroll the page or double-click. Tested with simulated touch events; still worth checking on a real tablet. |
 | NF-2.2.2 | A tutorial new players can complete without outside help. | Done | Guided tutorial during round 1 (`functions/tutorial.js`): offered on the first game; steps wait for the player (place a Cowboy → Start Wave → select the tower → buy an upgrade) with a bouncing arrow and a suggested spot. Start Wave stays hidden until a tower is placed. Skippable at any step; **Settings → Tutorial → Replay** offers it again. Plus the How to Play screen (F-1.1.8). |
-| NF-2.2.3 | Visual feedback when towers are placed or upgrades bought. | Done | Dust puff when a tower lands, floating cost text ("-$25" on place, "-$40" on upgrade, "+$12" on sell), gold sparkle on upgrade, 3 level pips under every tower (`functions/effects.js`), and an upgrade glow that traces each upgraded tower's own outline: red-orange on the damage path, electric blue on the rate path, brighter at each level, gently pulsing, with rising sparks at level 3. Each sprite frame's glow is pre-blurred once and cached (`Tower._sprite`, `UI.drawTowerWithAura`); live canvas blur made frames 4× slower. |
+| NF-2.2.3 | Visual feedback when towers are placed or upgrades bought. | Done | Dust puff when a tower lands, floating cost text ("-$25" on place, "-$50" on upgrade, "+$12" on sell), gold sparkle on upgrade, 3 level pips under every tower (`functions/effects.js`), and an upgrade glow that traces each upgraded tower's own outline: red-orange on the damage path, electric blue on the rate path, brighter at each level, gently pulsing, with rising sparks at level 3. Each sprite frame's glow is pre-blurred once and cached (`Tower._sprite`, `UI.drawTowerWithAura`); live canvas blur made frames 4× slower. |
 | NF-2.2.4 | Audio feedback for placing towers and buying upgrades. | Done | Place, upgrade, and sell sounds (see X-4) |
 
 ### 2.3 Accessibility

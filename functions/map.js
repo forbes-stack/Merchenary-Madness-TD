@@ -19,6 +19,7 @@ let pauseButton;      // pause icon button
 let speedButton;      // 1x / 2x toggle (SpeedButton.js)
 let gameSpeed = 1;    // game steps per frame, set by speedButton
 let isPaused = false; // pause flag
+let settingsOpen = false; // Settings panel open from the pause menu
 let tutorial;         // guided first round (tutorial.js)
 let showStats = false; // FPS / entity overlay, toggled with the F key
 
@@ -170,9 +171,9 @@ function mapDraw() {
     startWaveButton.hide();
   }
 
-  // Pause icon should only be visible when not game over
+  // Pause icon should only be visible when not game over (and not over the Settings panel)
   if (pauseButton) {
-    if (!info.isGameOver) pauseButton.show();
+    if (!info.isGameOver && !settingsOpen) pauseButton.show();
     else pauseButton.hide();
   }
 
@@ -213,8 +214,18 @@ function mapDraw() {
     info.draw(ui.placedTowers.length);
     speedButton.draw();
 
-    // Pause overlay with Resume / Restart
-    ui.displayPauseMenu();
+    if (settingsOpen) {
+      // Settings panel centered over the dimmed, paused game
+      push();
+      fill(0, 0, 0, 160);
+      noStroke();
+      rect(0, 0, width, height);
+      pop();
+      settingsDraw();
+    } else {
+      // Pause overlay with Resume / Restart / Settings / Quit to Title
+      ui.displayPauseMenu();
+    }
 
     return;
   }
@@ -311,12 +322,16 @@ function mousePressed() {
     return;
   }
 
-  // If paused, click goes to pause menu (Resume / Restart / Quit to Title)
+  // Settings panel: its sliders/buttons are HTML controls that handle their own clicks
+  if (settingsOpen) return;
+
+  // If paused, click goes to pause menu (Resume / Restart / Settings / Quit to Title)
   if (isPaused) {
     ui.handlePauseClick(
       () => { isPaused = false; }, // resume callback
       restartGame,                 // restart callback (same as Game Over)
-      quitToTitle
+      quitToTitle,
+      openPauseSettings
     );
     return;
   }
@@ -437,8 +452,21 @@ function restartGame() {
   sfx.startMusic();
 }
 
+/**
+ * Open the Settings panel (same one as the start screen) from the pause menu,
+ * centered over the map; Back returns to the pause menu.
+ */
+function openPauseSettings() {
+  settingsOpen = true;
+  openSettings(() => { settingsOpen = false; },
+    (width - SETTINGS_W) / 2, (height - SETTINGS_H) / 2);
+}
+
 // Toggle pause with the P key (still supported)
 function keyPressed() {
+  // stay paused while the Settings panel is open (use its Back button)
+  if (settingsOpen) return;
+
   if (key === 'p' || key === 'P') {
     // Don’t allow pausing if game over
     if (!info.isGameOver) {

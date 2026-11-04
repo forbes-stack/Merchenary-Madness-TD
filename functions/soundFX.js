@@ -10,7 +10,7 @@ class SoundFX {
   // (Gatling, 2x speed, big waves) doesn't stack into noise
   static MIN_GAP = {
     revolver: 60, gatling: 70, cannon: 90, sniper: 90,
-    kill: 50, escape: 120, explode: 120,
+    kill: 50, escape: 120, explode: 120, clink: 90,
   };
 
   constructor() {
@@ -158,6 +158,10 @@ class SoundFX {
       case "explode":
         this._noise(t, { filter: "lowpass", freq: 900, dur: 0.7, gain: 0.8 });
         this._tone(t, { f0: 90, f1: 30, dur: 0.7, gain: 0.8 });
+        break;
+      case "clink": // bullet bouncing off Ironclad armor (two inharmonic metal tones)
+        this._tone(t, { type: "triangle", f0: 2400, f1: 2100, dur: 0.09, gain: 0.12 });
+        this._tone(t, { type: "sine", f0: 3550, f1: 3300, dur: 0.06, gain: 0.08 });
         break;
       case "escape":
         this._tone(t, { type: "square", f0: 440, f1: 220, dur: 0.3, gain: 0.15 });

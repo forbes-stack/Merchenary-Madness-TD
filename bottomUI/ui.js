@@ -662,13 +662,13 @@ class UI {
     stroke(0);
     strokeWeight(4);
     fill(255);
-    text("PAUSED", width / 2, height / 2 - 100);
+    text("PAUSED", width / 2, height / 2 - 150);
     pop();
 
     const btnW = 220;
     const btnH = 60;
     const centerX = width / 2 - btnW / 2;
-    const resumeY = height / 2 - 10;
+    const resumeY = height / 2 - 70;
     const restartY = resumeY + 80;
 
     // Resume button
@@ -717,8 +717,26 @@ class UI {
       type: "restart"
     });
 
-    // Quit to Title under Restart
-    const quit = { x: centerX, y: restartY + 80, w: btnW, h: btnH, type: "quit" };
+    // Settings (volume, color-blind mode) under Restart, styled like the start screen's
+    const settingsY = restartY + 80;
+    push();
+    rectMode(CORNER);
+    fill(0, 100, 0);     // darkgreen, like the start screen buttons
+    stroke(34, 139, 34); // forestgreen border
+    strokeWeight(4);
+    rect(centerX, settingsY, btnW, btnH, 12);
+    fill(144, 238, 144);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(26);
+    textFont('cursive');
+    text("Settings", centerX + btnW / 2, settingsY + btnH / 2);
+    pop();
+
+    this.pauseButtons.push({ x: centerX, y: settingsY, w: btnW, h: btnH, type: "settings" });
+
+    // Quit to Title at the bottom
+    const quit = { x: centerX, y: settingsY + 80, w: btnW, h: btnH, type: "quit" };
     this.drawQuitButton(quit);
     this.pauseButtons.push(quit);
   }
@@ -743,7 +761,7 @@ class UI {
    * Handle clicks when the game is paused.
    * `onResume` and `onRestart` come from sketch.js
    */
-  handlePauseClick(onResume, onRestart, onQuit) {
+  handlePauseClick(onResume, onRestart, onQuit, onSettings) {
     if (!this.pauseButtons || this.pauseButtons.length === 0) return;
 
     for (let b of this.pauseButtons) {
@@ -757,6 +775,8 @@ class UI {
           onRestart();
         } else if (b.type === "quit" && typeof onQuit === "function") {
           onQuit();
+        } else if (b.type === "settings" && typeof onSettings === "function") {
+          onSettings();
         }
         return;
       }

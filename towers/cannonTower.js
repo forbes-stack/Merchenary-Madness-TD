@@ -22,28 +22,29 @@ class CannonTower extends Tower {
     // Fallback: if enemies array is missing, just do single-target
     if (!allEnemies || !Array.isArray(allEnemies)) {
       if (typeof mainTarget.takeDamage === "function") {
-        mainTarget.takeDamage(this.damage, infoTracker);
+        mainTarget.takeDamage(this.damage, infoTracker, this);
       }
       return;
     }
 
     // --- Full damage to main target ---
     if (typeof mainTarget.takeDamage === "function") {
-      mainTarget.takeDamage(this.damage, infoTracker);
+      mainTarget.takeDamage(this.damage, infoTracker, this);
     }
 
-    // --- Splash to nearby enemies (half damage) ---
-    const splashDamage = Math.floor(this.damage / 2);
+    // --- Splash to nearby enemies (half damage minus 5) ---
+    const splashDamage = Math.max(0, Math.floor(this.damage / 2) - 5); // half damage, minus 5
 
     for (let enemy of allEnemies) {
       if (!enemy || !enemy.alive) continue;
       if (enemy === mainTarget) continue;
+      if (enemy.camo) continue; // camo (Ghost) slips through the blast; only a direct hit can touch it
 
       // Distance from impact
       const d = dist(mainTarget.x, mainTarget.y, enemy.x, enemy.y);
       if (d <= this.splashRadius) {
         if (typeof enemy.takeDamage === "function") {
-          enemy.takeDamage(splashDamage, infoTracker);
+          enemy.takeDamage(splashDamage, infoTracker, this);
         }
       }
     }

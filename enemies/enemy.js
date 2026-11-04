@@ -79,7 +79,8 @@ if(!this.alive) return;
     ctx.fillRect(this.x - 10, this.y - 15, w, 5);
   }
 
-  takeDamage(amount, infoTracker) {
+  // source = the tower that dealt the damage (some enemies only take damage from certain towers)
+  takeDamage(amount, infoTracker, source) {
     if (!this.alive) return;
 
     this.health -= amount;

@@ -42,13 +42,13 @@ const HOW_TO_OUTLAWS = [
   ['dynamite', 10, 0, 100, 190, 'Dynamite', 'Splits in 3'],
   ['ghost', 10, 0, 100, 190, 'Ghost', 'Camo'],
   ['doc', 10, 0, 100, 190, 'Doc', 'Heals'],
-  ['ironclad', 10, 0, 100, 190, 'Ironclad', 'Armored'],
+  ['ironclad', 10, 0, 100, 190, 'Ironclad', 'Cannons only'],
 ];
 
 const HOW_TO_TOWERS = [
   ['cowboy', 'Cowboy', '$25', 'All-rounder'],
   ['gatling', 'Gatling', '$45', 'Rapid fire'],
-  ['cannon', 'Cannoneer', '$70', 'Splash damage'],
+  ['cannon', 'Cannoneer', '$70', 'Splash, beats armor'],
   ['sniper', 'Sniper', '$85', 'Any range, spots camo'],
 ];
 
@@ -118,6 +118,6 @@ function howToPlayDraw() {
   fill(255)
   textSize(13)
   textAlign(CENTER, TOP)
-  text('Camo outlaws can only be hit by Snipers, or towers near a Sniper.  Armor blocks 5 damage per hit.', 40, 510, 620, 40)
+  text('Camo outlaws can only be hit by Snipers, or towers near a Sniper.  Only Cannons can hurt Ironclads.', 40, 510, 620, 40)
   pop()
 }

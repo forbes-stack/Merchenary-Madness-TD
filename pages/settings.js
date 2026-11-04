@@ -1,16 +1,33 @@
 // settings.js
-// Settings screen, opened from the start screen: volume sliders and color-blind mode.
-// Draws on the 700x650 start canvas; the sliders/select are DOM elements inside <main>.
+// Settings screen: volume sliders, color-blind mode, and tutorial replay.
+// Opened from the start screen and from the in-game pause menu. It is a 700x650 panel
+// drawn at an origin on the current canvas (0,0 on the start screen, centered over the
+// map in game); the sliders/select/buttons are DOM elements placed to match.
 
 let settingsBg;
-let settingsControls = null; // created the first time the screen opens
+let settingsControls = null;  // created the first time the screen opens
+let settingsLayout = [];      // [element, x, y, w, h, fontSize] in panel coordinates
+let settingsOrigin = { x: 0, y: 0 };
+let settingsOnBack = null;    // where Back returns to (start screen or pause menu)
+
+const SETTINGS_W = 700;
+const SETTINGS_H = 650;
 
 function settingsPreload() {
   settingsBg = loadImage('assets/settings_bg.png')
 }
 
-function openSettings(onBack) {
-  if (!settingsControls) createSettingsControls(onBack);
+/**
+ * Show the settings controls with the panel's top-left at (originX, originY) in
+ * canvas coordinates; Back calls onBack.
+ */
+function openSettings(onBack, originX = 0, originY = 0) {
+  settingsOnBack = onBack;
+  settingsOrigin = { x: originX, y: originY };
+  if (!settingsControls) createSettingsControls();
+  for (const [el, x, y, w, h, fontSize] of settingsLayout) {
+    canvasLayout.place(el, originX + x, originY + y, w, h, fontSize);
+  }
   for (const el of settingsControls) el.show();
 }
 
@@ -28,12 +45,14 @@ const SETTINGS_ROWS = {
   tutorial: 515,
 };
 
-function createSettingsControls(onBack) {
+function createSettingsControls() {
   settingsControls = [];
+  settingsLayout = [];
+  const place = (el, x, y, w, h, fontSize) => settingsLayout.push([el, x, y, w, h, fontSize]);
 
   const makeSlider = (key, preview) => {
     const slider = createSlider(0, 100, Math.round(gameSettings[key] * 100), 1);
-    canvasLayout.place(slider, 330, SETTINGS_ROWS[key] - 22, 220, 20);
+    place(slider, 330, SETTINGS_ROWS[key] - 22, 220, 20);
     slider.input(() => {
       gameSettings[key] = slider.value() / 100;
       gameSettings.save();
@@ -52,7 +71,7 @@ function createSettingsControls(onBack) {
   const modeSelect = createSelect();
   for (const mode of COLOR_BLIND_MODES) modeSelect.option(mode);
   modeSelect.selected(gameSettings.colorBlind);
-  canvasLayout.place(modeSelect, 330, SETTINGS_ROWS.colorBlind - 24, 160, 32, 16);
+  place(modeSelect, 330, SETTINGS_ROWS.colorBlind - 24, 160, 32, 16);
   modeSelect.changed(() => {
     gameSettings.colorBlind = modeSelect.value();
     gameSettings.save();
@@ -61,7 +80,7 @@ function createSettingsControls(onBack) {
 
   // Offers the guided tutorial again at the start of the next game
   const replay = createButton(gameSettings.tutorialDone ? 'Replay' : 'Queued ✓');
-  canvasLayout.place(replay, 330, SETTINGS_ROWS.tutorial - 27, 160, 36, 18);
+  place(replay, 330, SETTINGS_ROWS.tutorial - 27, 160, 36, 18);
   replay.style('background-color', '#c97a2b');
   replay.style('color', 'white');
   replay.style('border', '2px solid #603814');
@@ -76,22 +95,24 @@ function createSettingsControls(onBack) {
 
   const back = createButton('Back');
   styleButton(back);
-  canvasLayout.place(back, 270, 570, 160, 50, 28);
+  place(back, 270, 570, 160, 50, 28);
   back.mousePressed(() => {
     closeSettings();
-    if (onBack) onBack();
+    if (settingsOnBack) settingsOnBack();
   });
   settingsControls.push(back);
 }
 
 function settingsDraw() {
+  push()
+  translate(settingsOrigin.x, settingsOrigin.y)
+
   // wood-wall backdrop (center crop of the 1158x650 image)
-  image(settingsBg, 0, 0, width, height, (settingsBg.width - width) / 2, 0, width, height)
+  image(settingsBg, 0, 0, SETTINGS_W, SETTINGS_H, (settingsBg.width - SETTINGS_W) / 2, 0, SETTINGS_W, SETTINGS_H)
 
   //56,34,0
   //74,45,0
   //107,65,0
-  push()
   fill(107,65,0)
   strokeWeight(5)
   stroke(74,45,0)

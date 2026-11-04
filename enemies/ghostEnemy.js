@@ -1,5 +1,5 @@
 // Camo: only Snipers, and towers within a Sniper's spotter range, can target it.
-// Cannon splash still hits it.
+// Cannon splash can't hit it (only a direct hit from a tower that can see it).
 class ghostEnemy extends GridEnemy {
   constructor(path) {
     super(path, 1.5, 80, 6, ghostEnemyImg);
