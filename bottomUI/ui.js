@@ -6,14 +6,20 @@ class UI {
     // Map area where towers are allowed
     this.dropZone = { x: 0, y: 0, w: 1400, h: 500 };
 
-    // Tower templates in the palette
+    // Tower templates in the palette.
+    // Stats (range/damage/rate) live in the tower classes; `create` builds one.
     this.towerTypes = [
-      { type: "basic",   range: 120, damage: 15, rate: 0.5, cost: 50 },
-      { type: "gatling", range: 100, damage: 5,  rate: 0.1, cost: 75 },
-      { type: "cannon",  range: 150, damage: 30, rate: 1, cost: 100 },
-      { type: "sniper",  range: 20,  damage: 75, rate: 1.5, cost: 125 },
+      { type: "basic",   name: "Cowboy",         cost: 25,  create: (x, y) => new Tower(x, y, 120, 15, 0.5) },
+      { type: "gatling", name: "Gatling Gunner", cost: 45,  create: (x, y) => new GatlingGunTower(x, y) },
+      { type: "cannon",  name: "Cannoneer",      cost: 70,  create: (x, y) => new CannonTower(x, y) },
+      { type: "sniper",  name: "Sniper",         cost: 85,  create: (x, y) => new SniperTower(x, y) },
       // add more types with their own cost...
     ];
+
+    // One sample of each tower, used to show its real stats in the hover tooltip
+    for (let def of this.towerTypes) {
+      def.sample = def.create(0, 0);
+    }
 
     // Palette tile centers
     this.paletteSlots = [
@@ -31,7 +37,12 @@ class UI {
     this.gatlingTowerImg = assets.gatlingTowerImg;
 
     // Drag helper (expects TowerDragger to be loaded)
+    // Canvas areas covered by HTML controls (set in map.js): towers can't be placed there,
+    // and tower menus avoid them
+    this.reservedRects = [];
+
     this.dragger = new TowerDragger(this.towerTypes, this.dropZone, {cowboyTower, cannonTowerImg, sniperTowerImg, gatlingTowerImg});
+    this.dragger.blockedRects = this.reservedRects;
 
     this.bg = assets.bg;
     this.uiBg = assets.uiBg;
@@ -39,6 +50,7 @@ class UI {
     this.cowboyIcon = assets.cowboyIcon;
     this.cannonIcon = assets.cannonIcon;
     this.sniperIcon = assets.sniperIcon;
+    this.homeIcon = assets.homeIcon;
 
     // Upgrade Management
     this.upgradeManager = new UpgradeManager();
@@ -131,122 +143,153 @@ class UI {
 
     // Clear selection so the menu closes
     this.selectedTower = null;
+
+    return refund;
   }
 
-  drawUpgradeUI(info) {
+  /**
+   * Tower menu: four round icon buttons in a ring around the selected tower.
+   *   top = upgrade damage (⚔), right = upgrade rate (⏱),
+   *   left = targeting mode (◎), bottom = sell ($).
+   * Each shows its price/state underneath; hovering shows a short label.
+   */
+  drawUpgradeUI(info, interactive = true) {
     if (!this.selectedTower) return;
 
     const t = this.selectedTower;
     const options = this.upgradeManager.getUpgradeOptions(t);
+    const colors = gameSettings.colors();
 
     // CRITICAL: Clear hitboxes before drawing new ones.
     this.upgradeButtons = [];
 
-    // Position buttons underneath the tower
-    let startY = t.y + 30;
-    let btnW = 120;
-    let btnH = 35;
+    const ringR = 58;   // distance from the tower to each button
+    const btnR = 20;    // button radius
+    const margin = { left: btnR + 2, right: width - btnR - 2, top: btnR + 2, bottom: height - btnR - 14 };
+    const fits = (x, y) =>
+      x >= margin.left && x <= margin.right && y >= margin.top && y <= margin.bottom &&
+      // stay out from under the HTML controls (Pause / Start Wave / speed)
+      !this.reservedRects.some(z =>
+        x + btnR > z.x && x - btnR < z.x + z.w && y + btnR > z.y && y - btnR < z.y + z.h);
 
-    // Helper to draw a button
-    const drawBtn = (offsetY, label, cost, type) => {
-      const btnX = t.x - (btnW / 2);
-      const btnY = startY + offsetY;
+    // Buttons in order: damage, rate, target, sell. Normally a full ring around the tower.
+    // Near an edge or corner it tries, in order: a half-circle fan, a wider quarter-circle
+    // fan, then a straight line of buttons, each pointed toward the middle of the map and
+    // rotated (in 5° steps) until every button fits on screen without overlapping another.
+    const at = (angle, r) => ({ x: t.x + r * cos(radians(angle)), y: t.y + r * sin(radians(angle)) });
+    const layouts = [
+      () => [-90, 0, 180, 90].map(a => at(a, ringR)),               // full ring (angle ignored)
+      (dir) => [-75, -25, 25, 75].map(a => at(dir + a, 62)),         // half-circle fan
+      (dir) => [-45, -15, 15, 45].map(a => at(dir + a, 90)),         // quarter-circle fan
+      (dir) => [52, 98, 144, 190].map(d => at(dir, d)),              // straight line
+    ];
+    const toCenter = degrees(Math.atan2(height / 2 - t.y, width / 2 - t.x));
+    const turns = [0];
+    for (let turn = 5; turn <= 180; turn += 5) turns.push(turn, -turn);
 
-      const affordable = info.currency >= cost;
+    let positions = null;
+    for (const [i, layout] of layouts.entries()) {
+      for (const turn of (i === 0 ? [0] : turns)) {
+        const candidate = layout(toCenter + turn);
+        if (candidate.every(p => fits(p.x, p.y))) { positions = candidate; break; }
+      }
+      if (positions) break;
+    }
+    // last resort: full ring squeezed onto the screen
+    if (!positions) {
+      positions = [-90, 0, 180, 90].map(a => at(a, ringR)).map(p => ({
+        x: constrain(p.x, margin.left, margin.right),
+        y: constrain(p.y, margin.top, margin.bottom),
+      }));
+    }
+    const place = (i) => positions[i];
+
+    // Upgrade buttons: price, or locked (other path chosen), or max level
+    const upgradeButton = (type, icon, pos) => {
+      const opt = options[type];
+      if (opt) {
+        const affordable = info.currency >= opt.cost;
+        return { type, pos, icon, fill: affordable ? colors.good : colors.bad,
+          caption: `$${opt.cost}`,
+          hover: `Upgrade ${type === "damage" ? "damage" : "fire rate"} to Lv ${t.level + 1} ($${opt.cost})` };
+      }
+      if (t.isMaxLevel()) {
+        return { type, pos, icon: "★", fill: [200, 160, 0], caption: "MAX", hover: "Max level reached" };
+      }
+      return { type, pos, icon: "🔒", fill: [90, 90, 90], caption: "Locked",
+        hover: `Locked: this tower is on the ${t.upgradePath} path` };
+    };
+
+    const sellPrice = Math.floor(this.getTowerTotalInvestedCost(t) / 2);
+    const buttons = [
+      upgradeButton("damage", "⚔", place(0)),
+      upgradeButton("rate", "⏱", place(1)),
+      { type: "target", pos: place(2), icon: "◎", fill: [70, 130, 180],
+        caption: t.targetMode, hover: `Target: ${t.targetMode} (click to change)` },
+      { type: "sell", pos: place(3), icon: "$", fill: [150, 75, 0],
+        caption: `$${sellPrice}`, hover: `Sell for $${sellPrice}` },
+    ];
+
+    let hovered = null;
+    for (const b of buttons) {
+      const { x, y } = b.pos;
+      const isHover = interactive && dist(mouseX, mouseY, x, y) <= btnR;
+      if (isHover) hovered = b;
 
       push();
-      fill(affordable ? 'green' : 'red');
+      // button
       stroke(255);
-      rect(btnX, btnY, btnW, btnH, 5);
-
-      fill(255);
+      strokeWeight(isHover ? 3 : 2);
+      fill(...b.fill);
+      circle(x, y, btnR * 2);
+      // icon
       noStroke();
+      fill(255);
       textAlign(CENTER, CENTER);
-      textSize(14);
-      text(`${label} ($${cost})`, btnX + btnW / 2, btnY + btnH / 2);
+      textSize(18);
+      text(b.icon, x, y + 1);
+      // caption under the button
+      textSize(12);
+      textStyle(BOLD);
+      stroke(0);
+      strokeWeight(3);
+      text(b.caption, x, y + btnR + 9);
       pop();
 
       // Add to hitboxes
       this.upgradeButtons.push({
-        x: btnX, y: btnY, w: btnW, h: btnH,
-        type: type // 'damage' or 'rate' or 'sell'
+        x: x - btnR, y: y - btnR, w: btnR * 2, h: btnR * 2,
+        type: b.type // 'damage', 'rate', 'target' or 'sell'
       });
-    };
+    }
 
-    // Helper to draw locked path message
-    const drawLocked = (offsetY) => {
+    // Hover label in one spot above the whole ring, so it never covers a button
+    if (hovered) {
       push();
-      fill(100);
-      stroke(255);
-      rect(t.x - (btnW / 2), startY + offsetY, btnW, btnH, 5);
-      fill(200);
+      textSize(13);
+      const w = textWidth(hovered.hover) + 16;
+      const lx = constrain(t.x, w / 2 + 2, width - w / 2 - 2);
+      const topY = Math.min(t.y, ...buttons.map(b => b.pos.y));
+      const ly = topY - btnR - 16 >= 13 ? topY - btnR - 16
+        : Math.max(...buttons.map(b => b.pos.y)) + btnR + 30; // no room above: show it below
+
+      rectMode(CENTER);
+      fill(60, 35, 10, 235);
+      stroke(255, 223, 0);
+      strokeWeight(1.5);
+      rect(lx, ly, w, 22, 5);
       noStroke();
+      fill(255);
       textAlign(CENTER, CENTER);
-      textSize(12);
-      text("Path Locked", t.x, startY + offsetY + btnH / 2);
+      text(hovered.hover, lx, ly + 1);
       pop();
-    };
-
-    // --- Upgrades layout ---
-    let nextOffsetY = 0;
-
-    // Damage option
-    if (options.damage) {
-      drawBtn(0, "Upgr Dmg", options.damage.cost, 'damage');
-      nextOffsetY = 40;
-    } else if (t.upgradePath === 'rate' && !t.isMaxLevel()) {
-      drawLocked(0);
-      nextOffsetY = 40;
     }
-
-    // Rate option
-    if (options.rate) {
-      drawBtn(nextOffsetY, "Upgr Rate", options.rate.cost, 'rate');
-      nextOffsetY += 40;
-    } else if (t.upgradePath === 'damage' && !t.isMaxLevel()) {
-      drawLocked(nextOffsetY);
-      nextOffsetY += 40;
-    }
-
-    // Max level message
-    if (t.isMaxLevel && t.isMaxLevel()) {
-      push();
-      fill(255, 215, 0);
-      textAlign(CENTER);
-      text("MAX LEVEL", t.x, startY + nextOffsetY + 15);
-      pop();
-      nextOffsetY += 35;
-    }
-
-    // --- Sell Button (always available when tower is selected) ---
-    const totalCost = this.getTowerTotalInvestedCost(t);
-    const sellPrice = Math.floor(totalCost / 2);
-
-    const sellOffsetY = nextOffsetY + 10; // a bit below other buttons
-    const sellX = t.x - (btnW / 2);
-    const sellY = startY + sellOffsetY;
-
-    push();
-    rectMode(CORNER);
-    fill(150, 75, 0);  // brown-ish sell button
-    stroke(255);
-    rect(sellX, sellY, btnW, btnH, 5);
-
-    fill(255);
-    noStroke();
-    textAlign(CENTER, CENTER);
-    textSize(14);
-    text(`Sell ($${sellPrice})`, sellX + btnW / 2, sellY + btnH / 2);
-    pop();
-
-    // Add sell button hitbox
-    this.upgradeButtons.push({
-      x: sellX, y: sellY, w: btnW, h: btnH,
-      type: 'sell'
-    });
   }
 
-  display(info, allEnemies) {
+  /**
+   * @param interactive false while paused / game over: no hover popups
+   */
+  display(info, allEnemies, interactive = true) {
     // CRITICAL: Clear old button hitboxes every single frame.
     this.upgradeButtons = [];
 
@@ -313,22 +356,36 @@ class UI {
       push();
       textAlign(CENTER, TOP);
       textSize(16);
-      noStroke();
+      textStyle(BOLD);
+      stroke(0);          // dark outline so the price reads on the orange icon tiles
+      strokeWeight(3);
 
-      if (hasEnoughGold) fill(255, 223, 0);
-      else fill(255, 0, 0);
+      fill(...(hasEnoughGold ? gameSettings.colors().goodText : gameSettings.colors().badText));
 
       text(`$${cost}`, slot.x, slot.y + 25);
       pop();
+
+      // At the tower cap: gray the icon out
+      if (this.atTowerCap(info)) {
+        push();
+        rectMode(CENTER);
+        noStroke();
+        fill(30, 30, 30, 150);
+        rect(slot.x, slot.y, 100, 100, 12);
+        pop();
+      }
     }
 
+    this.drawBuySlotButton(info);
+
     // Placed towers: update once with the whole enemy array, then draw
+    if (allEnemies && info) {
+      this.updateTowers(allEnemies, info);
+    }
     for (let t of this.placedTowers) {
       if (!t) continue; // Safety Check
-      if (allEnemies && info) {
-        t.update(allEnemies, info);
-      }
-      t.draw();
+      this.drawTowerWithAura(t); // tower sprite + upgrade glow
+      this.drawLevelPips(t);
     }
 
     // Draw selection and upgrade UI
@@ -337,12 +394,180 @@ class UI {
         this.selectedTower = null;
       } else {
         this.selectedTower.drawSelection();
-        this.drawUpgradeUI(info);
+        this.drawUpgradeUI(info, interactive);
       }
     }
 
     // Dragging preview (ghost tower + range)
     this.dragger.drawPreview(info, this.path, this.placedTowers);
+
+    // Name + damage popup for the palette tower under the mouse (not while paused)
+    if (interactive) this.drawPaletteTooltip();
+  }
+
+  /**
+   * Draws a tower with its upgrade aura: a glow that hugs the sprite's own outline
+   * (a pre-blurred copy of its sprite, see Tower._sprite), red-orange on the
+   * damage path and electric blue on the rate path. Brighter each level,
+   * gently pulsing; level 3 adds sparks rising around the figure.
+   */
+  drawTowerWithAura(t) {
+    const level = t.level || 0;
+    if (level === 0 || !t.upgradePath) {
+      t.draw();
+      return;
+    }
+
+    const col = t.upgradePath === "damage" ? [255, 90, 30] : [60, 170, 255];
+    const pulse = Math.sin(frameCount * 0.08 + t.x * 0.05);  // towers pulse out of sync
+    // brighter each level (0.55 / 0.8 / 1.0), gently pulsing
+    const alpha = constrain(0.3 + level * 0.25 + pulse * 0.12, 0, 1);
+
+    // the tower draws a pre-blurred glow slice behind its sprite (Tower._sprite)
+    t.glow = { color: col, alpha };
+    t.draw();
+    t.glow = null;
+
+    // level 3: sparks drifting upward around the figure
+    if (level >= 3) {
+      push();
+      noStroke();
+      for (let i = 0; i < 4; i++) {
+        const phase = (frameCount * 0.015 + i / 4 + t.x * 0.013) % 1;
+        const sx = t.x + Math.sin(i * 2.1 + frameCount * 0.03) * 22;
+        const sy = t.y + 25 - phase * 60;
+        fill(255, 255, 220, 230 * (1 - phase));
+        circle(sx, sy, 4);
+        fill(...col, 150 * (1 - phase));
+        circle(sx, sy, 8);
+      }
+      pop();
+    }
+  }
+
+  /** True when every tower slot is in use (buy another slot to place more). */
+  atTowerCap(info) {
+    return !!info && this.placedTowers.length >= info.towerSlots;
+  }
+
+  // "+1 Tower Slot" button in the palette strip, right of the four towers
+  buySlotButton = { x: 860, y: 620, w: 160, h: 90 };
+
+  overBuySlotButton() {
+    const b = this.buySlotButton;
+    return Math.abs(mouseX - b.x) <= b.w / 2 && Math.abs(mouseY - b.y) <= b.h / 2;
+  }
+
+  drawBuySlotButton(info) {
+    if (!info) return;
+    const b = this.buySlotButton;
+    const fee = info.nextSlotFee();
+    const affordable = info.currency >= fee;
+
+    push();
+    rectMode(CENTER);
+    fill(107, 65, 0, 235);
+    stroke(this.atTowerCap(info) ? color(255, 223, 0) : color(56, 34, 0)); // gold rim when it's needed
+    strokeWeight(this.atTowerCap(info) ? 4 : 3);
+    rect(b.x, b.y, b.w, b.h, 12);
+
+    noStroke();
+    textAlign(CENTER, CENTER);
+    fill(255);
+    textStyle(BOLD);
+    textSize(18);
+    text("+1 Tower Slot", b.x, b.y - 20);
+
+    textSize(22);
+    stroke(0);
+    strokeWeight(3);
+    fill(...(affordable ? gameSettings.colors().goodText : gameSettings.colors().badText));
+    text(`$${fee}`, b.x, b.y + 6);
+
+    noStroke();
+    fill(230);
+    textStyle(NORMAL);
+    textSize(13);
+    text(`next one +50%`, b.x, b.y + 31);
+    pop();
+  }
+
+  /** Three small pips under a tower; filled gold for each upgrade level bought. */
+  drawLevelPips(t) {
+    const y = t.y + 30;
+    push();
+    stroke(0);
+    strokeWeight(1);
+    for (let i = 0; i < 3; i++) {
+      if (i < (t.level || 0)) fill(255, 215, 0);
+      else fill(60, 60, 60, 160);
+      circle(t.x - 9 + i * 9, y, 6);
+    }
+    pop();
+  }
+
+  /** One game step for every placed tower (aim + shoot), without drawing. */
+  updateTowers(allEnemies, info) {
+    this.updateCamoDetection();
+    for (let t of this.placedTowers) {
+      if (!t) continue; // Safety Check
+      t.update(allEnemies, info);
+    }
+  }
+
+  /**
+   * Snipers always see camo enemies, and act as spotters: any tower within
+   * SPOTTER_RANGE of a Sniper can target camo too.
+   */
+  updateCamoDetection() {
+    const SPOTTER_RANGE = 150;
+    const snipers = this.placedTowers.filter(t => t && t.towerType === "sniper");
+    for (let t of this.placedTowers) {
+      if (!t) continue;
+      t.detectsCamo = t.towerType === "sniper" ||
+        snipers.some(s => dist(s.x, s.y, t.x, t.y) <= SPOTTER_RANGE);
+    }
+  }
+
+  /** Palette slot under the mouse (same radius as clicking to drag), or null. */
+  getHoveredSlot() {
+    for (let slot of this.paletteSlots) {
+      if (slot && dist(mouseX, mouseY, slot.x, slot.y) < 58) return slot;
+    }
+    return null;
+  }
+
+  drawPaletteTooltip() {
+    if (this.dragger.draggingTower) return;
+    const slot = this.getHoveredSlot();
+    if (!slot) return;
+    const def = this.towerTypes.find(t => t.type === slot.type);
+    if (!def) return;
+
+    const boxW = 170;
+    const boxH = 54;
+    const boxX = slot.x - boxW / 2;
+    const boxY = slot.y - 58 - boxH - 8; // just above the icon
+
+    push();
+    rectMode(CORNER);
+    fill(60, 35, 10, 230);
+    stroke(255, 223, 0);
+    strokeWeight(2);
+    rect(boxX, boxY, boxW, boxH, 8);
+
+    noStroke();
+    textAlign(CENTER, CENTER);
+    fill(255, 223, 0);
+    textSize(18);
+    textStyle(BOLD);
+    text(def.name, slot.x, boxY + 17);
+
+    fill(255);
+    textSize(15);
+    textStyle(NORMAL);
+    text(`Damage: ${def.sample.damage}`, slot.x, boxY + 38);
+    pop();
   }
 
   /**
@@ -387,6 +612,32 @@ class UI {
     textAlign(CENTER, CENTER);
     textSize(28);
     text("Restart", btnX + btnW / 2, btnY + btnH / 2);
+    pop();
+
+    // Quit to Title under Restart
+    this.quitButton = { x: btnX, y: btnY + 80, w: btnW, h: btnH };
+    this.drawQuitButton(this.quitButton);
+  }
+
+  /** Brown "Quit to Title" button with the house icon (assets/home.png). */
+  drawQuitButton(b) {
+    push();
+    rectMode(CORNER);
+    fill(107, 65, 0);
+    stroke(0);
+    strokeWeight(3);
+    rect(b.x, b.y, b.w, b.h, 12);
+
+    if (this.homeIcon) {
+      imageMode(CENTER);
+      image(this.homeIcon, b.x + 32, b.y + b.h / 2, 40, 40);
+    }
+
+    fill(255);
+    noStroke();
+    textAlign(CENTER, CENTER);
+    textSize(22);
+    text("Quit to Title", b.x + b.w / 2 + 18, b.y + b.h / 2);
     pop();
   }
 
@@ -465,23 +716,26 @@ class UI {
       h: btnH,
       type: "restart"
     });
+
+    // Quit to Title under Restart
+    const quit = { x: centerX, y: restartY + 80, w: btnW, h: btnH, type: "quit" };
+    this.drawQuitButton(quit);
+    this.pauseButtons.push(quit);
   }
 
   /**
    * Handle clicks when the game is over.
    * `onRestart` is a callback (like restartGame in sketch.js).
    */
-  handleGameOverClick(onRestart) {
-    if (!this.restartButton) return;
-
-    const b = this.restartButton;
-    if (
+  handleGameOverClick(onRestart, onQuit) {
+    const hit = (b) => b &&
       mouseX > b.x && mouseX < b.x + b.w &&
-      mouseY > b.y && mouseY < b.y + b.h
-    ) {
-      if (typeof onRestart === "function") {
-        onRestart();
-      }
+      mouseY > b.y && mouseY < b.y + b.h;
+
+    if (hit(this.restartButton) && typeof onRestart === "function") {
+      onRestart();
+    } else if (hit(this.quitButton) && typeof onQuit === "function") {
+      onQuit();
     }
   }
 
@@ -489,7 +743,7 @@ class UI {
    * Handle clicks when the game is paused.
    * `onResume` and `onRestart` come from sketch.js
    */
-  handlePauseClick(onResume, onRestart) {
+  handlePauseClick(onResume, onRestart, onQuit) {
     if (!this.pauseButtons || this.pauseButtons.length === 0) return;
 
     for (let b of this.pauseButtons) {
@@ -501,6 +755,8 @@ class UI {
           onResume();
         } else if (b.type === "restart" && typeof onRestart === "function") {
           onRestart();
+        } else if (b.type === "quit" && typeof onQuit === "function") {
+          onQuit();
         }
         return;
       }
@@ -515,42 +771,62 @@ class UI {
         if (mouseX > btn.x && mouseX < btn.x + btn.w &&
             mouseY > btn.y && mouseY < btn.y + btn.h) {
 
+          const t = this.selectedTower;
           if (btn.type === 'sell') {
-            this.sellSelectedTower(info);
+            const refund = this.sellSelectedTower(info);
+            sfx.play('sell');
+            effects.floatText(t.x, t.y, `+$${refund}`, gameSettings.colors().goodText);
+          } else if (btn.type === 'target') {
+            t.cycleTargetMode();
           } else {
-            this.upgradeManager.applyUpgrade(this.selectedTower, btn.type, info);
+            const option = this.upgradeManager.getUpgradeOptions(t)[btn.type];
+            if (this.upgradeManager.applyUpgrade(t, btn.type, info)) {
+              sfx.play('upgrade');
+              effects.sparkle(t.x, t.y);
+              effects.floatText(t.x, t.y, `-$${option.cost}`, gameSettings.colors().badText);
+            }
           }
           return; // Click was handled
         }
       }
     }
 
-    // 2. Check Shop Palette (to start drag)
-    for (let slot of this.paletteSlots) {
-      if (!slot) continue;
-      const d = dist(mouseX, mouseY, slot.x, slot.y);
-      // altered this for the increased box palette/box size
-      if (d < 58) {
-        this.selectedTower = null; // Deselect tower to clear menu
-        this.dragger.startDrag(slot.type, mouseX, mouseY);
-        return;
+    // 2. Buy one more tower slot
+    if (this.overBuySlotButton()) {
+      const fee = info.nextSlotFee();
+      if (info.buySlot()) {
+        sfx.play('upgrade');
+        effects.floatText(this.buySlotButton.x, this.buySlotButton.y - 30, `-$${fee}`, gameSettings.colors().badText);
       }
+      return;
     }
 
-    // 3. Check Placed Towers (Select a tower)
+    // 3. Check Shop Palette (to start drag)
+    const slot = this.getHoveredSlot();
+    if (slot) {
+      this.selectedTower = null; // Deselect tower to clear menu
+      if (this.atTowerCap(info)) {
+        effects.floatText(slot.x, slot.y - 40, "Tower limit reached!", gameSettings.colors().badText);
+        return;
+      }
+      this.dragger.startDrag(slot.type, mouseX, mouseY);
+      return;
+    }
+
+    // 4. Check Placed Towers (Select a tower)
     let clickedATower = false;
     for (let i = this.placedTowers.length - 1; i >= 0; i--) {
       let t = this.placedTowers[i];
       if (!t) continue;
 
-      if (dist(mouseX, mouseY, t.x, t.y) < 20) {
+      if (dist(mouseX, mouseY, t.x, t.y) < (t.radius ?? 20)) {
         this.selectedTower = t;
         clickedATower = true;
         return;
       }
     }
 
-    // 4. Deselect (Clicked Empty Space)
+    // 5. Deselect (Clicked Empty Space)
     if (!this.dragger.draggingTower && !clickedATower) {
       this.selectedTower = null;
     }

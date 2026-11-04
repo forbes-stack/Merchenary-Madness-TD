@@ -1,6 +1,6 @@
 class fastEnemy extends Enemy {
   constructor(path) {
-    super(path, 3, 30, 1);
+    super(path, 3, 30, 2);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // frame cycle for walking animation
   }
@@ -29,11 +29,16 @@ class fastEnemy extends Enemy {
   }
 
   drawBody() {
-    push();
+    // imageMode set/reset by hand: push()/pop() is slow with many enemies
     imageMode(CENTER); // only affects this enemy drawing
 
     let x = this.x;
     let y = this.y;
+
+    // These frames sit high in their sheet crops; shift them down so every frame's
+    // feet land at the same spot just below the enemy's position (measured in pixels)
+    if (this.direction == "down") y += 37;
+    else if (this.direction == "up") y += 34;
 
     if (this.direction == "up") {
       if (this.frame < 30) {
@@ -72,7 +77,7 @@ class fastEnemy extends Enemy {
       }
     }
 
-    pop();
+    imageMode(CORNER);
   }
 
   draw() {

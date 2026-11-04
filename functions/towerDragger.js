@@ -6,6 +6,7 @@ class TowerDragger {
     this._dragCost = 0;
     this.draggingTowerType = null; // Keep track of the type
     this._towerRadius = 15;
+    this.blockedRects = []; // areas covered by HTML controls (shared with UI.reservedRects)
     this.cowboyTower = towerImages.cowboyTower;
     this.cannonTowerImg = towerImages.cannonTowerImg;
     this.sniperTowerImg = towerImages.sniperTowerImg;
@@ -19,21 +20,8 @@ class TowerDragger {
     this.draggingTowerType = towerType; // Store the type
     this._dragCost = base.cost || 0;
 
-    let towerInstance;
-
-    // Create an instance of the correct class
-    if (towerType === "basic") {
-      towerInstance = new Tower(startX, startY, base.range, base.damage, base.rate);
-    } else if (towerType === "gatling") {
-      towerInstance = new GatlingGunTower(startX, startY);
-    } else if (towerType === "cannon") {
-      towerInstance = new CannonTower(startX, startY);
-    } else if (towerType === "sniper") {
-      towerInstance = new SniperTower(startX, startY);
-    } else {
-      // Fallback just in case
-      towerInstance = new Tower(startX, startY, base.range, base.damage, base.rate);
-    }
+    // Create an instance of the correct class (defined in UI.towerTypes)
+    const towerInstance = base.create(startX, startY);
 
     towerInstance.towerType = towerType;
     this.draggingTower = towerInstance;
@@ -49,13 +37,14 @@ class TowerDragger {
     if (this.draggingTower) { this.draggingTower.x = x; this.draggingTower.y = y; }
   }
 
-  // CHANGE: overlap helper (returns true if overlapping an existing tower)
-  _overlaps(t, placedTowers, minSepPx = 30) {
+  // CHANGE: overlap helper (returns true if t's footprint overlaps an existing tower's)
+  _overlaps(t, placedTowers) {
     if (!placedTowers || !placedTowers.length) return false;
+    const r = t.radius ?? this._towerRadius;
     for (const p of placedTowers) {
       const dx = t.x - p.x;
       const dy = t.y - p.y;
-      if (Math.hypot(dx, dy) < minSepPx) return true;
+      if (Math.hypot(dx, dy) < r + (p.radius ?? this._towerRadius)) return true;
     }
     return false;
   }
@@ -68,6 +57,17 @@ class TowerDragger {
     );
   }
 
+  // Placement rules, shared by the preview and the actual drop so they always agree
+  _isValidSpot(t, path, placedTowers) {
+    const insideDrop = this._insideDrop(t.x, t.y);
+    const onPath = path && typeof path.isOnPath === "function" ? path.isOnPath(t.x, t.y) : false;
+    const overlapping = this._overlaps(t, placedTowers);
+    const r = t.radius ?? this._towerRadius;
+    const underControls = this.blockedRects.some(z =>
+      t.x + r > z.x && t.x - r < z.x + z.w && t.y + r > z.y && t.y - r < z.y + z.h);
+    return insideDrop && !onPath && !overlapping && !underControls;
+  }
+
   endDrag(path, placedTowers, infoTracker) {
     if (!this.draggingTower) {
       this.draggingTowerType = null;
@@ -75,12 +75,8 @@ class TowerDragger {
     }
 
     const t = this.draggingTower;
-    const insideDrop = this._insideDrop(t.x, t.y);
-    const onPath = path && typeof path.isOnPath === "function" ? path.isOnPath(t.x, t.y) : false;
-    const overlapping = this._overlaps(t, placedTowers, (t.radius ?? this._towerRadius) * 2);
-    const validSpot = insideDrop && !onPath && !overlapping;
 
-    if (!validSpot) {
+    if (!this._isValidSpot(t, path, placedTowers)) {
       // CANCEL placement quietly
       this.draggingTower = null;
       this.draggingTowerType = null;
@@ -101,6 +97,9 @@ class TowerDragger {
     }
 
     placedTowers.push(t);
+    sfx.play('place');
+    effects.dust(t.x, t.y);
+    effects.floatText(t.x, t.y, `-$${cost}`, gameSettings.colors().badText);
     this.draggingTower = null;
     this.draggingTowerType = null;
     this._dragCost = 0;
@@ -108,7 +107,7 @@ class TowerDragger {
 
   // 🔴 Show red ghost if not enough gold
   // UPDATED to show correct tower shape/color
-  drawPreview(infoTracker, path) {
+  drawPreview(infoTracker, path, placedTowers) {
     if (!this.draggingTower) return;
 
     const t = this.draggingTower;
@@ -118,10 +117,8 @@ class TowerDragger {
       ? infoTracker.currency < cost
       : false;
 
-    // (Optional) also factor in invalid placement: outside drop zone or on path
-    const insideDrop = t.x > this.dropZone.x && t.x < this.dropZone.x + this.dropZone.w &&
-      t.y > this.dropZone.y && t.y < this.dropZone.y + this.dropZone.h;
-    const invalidSpot = !insideDrop || (path && path.isOnPath(t.x, t.y, 20)); // 20px buffer
+    // Same rules as endDrag: inside drop zone, off the path, not overlapping a tower
+    const invalidSpot = !this._isValidSpot(t, path, placedTowers);
 
     const useRed = notEnoughGold || invalidSpot;
 
@@ -140,10 +137,10 @@ class TowerDragger {
       bodyColor = color(100, 100, 255, 160);
     }
 
-    // If invalid, override with red
+    // If invalid, override with the "bad" color (red, or the color-blind-safe one)
     if (useRed) {
-      rangeColor = color(255, 0, 0, 120);
-      bodyColor = color(255, 0, 0, 160);
+      rangeColor = color(...gameSettings.colors().bad, 120);
+      bodyColor = color(...gameSettings.colors().bad, 160);
     }
 
     // Draw ghost

@@ -1,6 +1,6 @@
 class tankEnemy extends Enemy {
   constructor(path) {
-    super(path, 0.5, 500, 5);
+    super(path, 0.5, 500, 10);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // frame cycle for walking animation
   }
@@ -29,11 +29,15 @@ class tankEnemy extends Enemy {
   }
 
   drawBody() {
-    push();
+    // imageMode set/reset by hand: push()/pop() is slow with many enemies
     imageMode(CENTER); // only affects this enemy
 
     let x = this.x;
     let y = this.y;
+
+    // These frames sit high in their sheet crops; shift them down so every frame's
+    // feet land at the same spot just below the enemy's position (measured in pixels)
+    if (this.direction == "up") y += 29;
 
 
     // Walking backward (up)
@@ -64,7 +68,7 @@ class tankEnemy extends Enemy {
       image(tankEnemyImg, x, y, 50, 50, 133, 0, 125, 170);
     }
 
-    pop();
+    imageMode(CORNER);
   }
 
   draw() {

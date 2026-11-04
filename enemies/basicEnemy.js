@@ -1,6 +1,6 @@
 class basicEnemy extends Enemy {
   constructor(path) {
-    super(path, 1, 100, 1);
+    super(path, 1, 100, 3);
     this.direction = "down"; // default starting direction
     this.frame = 0;          // which walking frame
   }
@@ -29,11 +29,15 @@ class basicEnemy extends Enemy {
   }
 
   drawBody() {
-    push();
+    // imageMode set/reset by hand: push()/pop() is slow with many enemies
     imageMode(CENTER);
 
     let x = this.x;
     let y = this.y;
+
+    // These frames sit high in their sheet crops; shift them down so every frame's
+    // feet land at the same spot just below the enemy's position (measured in pixels)
+    if (this.direction == "down") y += 30;
 
     // Walking down
     if (this.direction == "down") {
@@ -72,7 +76,7 @@ class basicEnemy extends Enemy {
     }
 
 
-    pop();
+    imageMode(CORNER);
   }
 
   draw() {

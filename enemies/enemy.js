@@ -69,18 +69,14 @@ if(!this.alive) return;
 
     this.drawBody(); // Draw the unique shape (implemented by subclass)
 
-    // Health bar background (Now centralized in the base class)
-    push();
-    fill(0);
-    rect(this.x - 10, this.y - 15, 20, 5);
-    pop();
-
-    // Health bar foreground
-    push();
-    fill(255, 0, 0);
-    let w = map(this.health, 0, this.maxHealth, 0, 20);
-    rect(this.x - 10, this.y - 15, w, 5);
-    pop();
+    // Health bar, drawn straight on the canvas context: p5's push/fill/rect/pop cost
+    // ~45 µs per enemy, which adds up with hundreds of enemies on screen.
+    const ctx = drawingContext;
+    ctx.fillStyle = "#000"; // background (with a 1px black border)
+    ctx.fillRect(this.x - 10.5, this.y - 15.5, 21, 6);
+    ctx.fillStyle = "#f00"; // foreground
+    const w = 20 * constrain(this.health / this.maxHealth, 0, 1);
+    ctx.fillRect(this.x - 10, this.y - 15, w, 5);
   }
 
   takeDamage(amount, infoTracker) {
@@ -90,6 +86,8 @@ if(!this.alive) return;
 
     if(this.health <= 0) {
       this.alive = false;
+      this.killed = true; // killed by a tower (vs. escaping off the end of the path)
+      sfx.play('kill');
       infoTracker.addCurrency(this.currency); // kill reward for enemy
     }
   }

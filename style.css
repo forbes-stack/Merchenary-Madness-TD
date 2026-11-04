@@ -2,12 +2,23 @@ html, body {
   margin: 0;
   padding: 0;
   height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
   background-color: black;
+}
+
+body {
+  display: flex;
+  overflow: hidden; /* the game is scaled to fit the window (functions/layout.js) */
+}
+
+/* margin: auto centers the game, but unlike justify-content/align-items it
+   never pushes the canvas off the top/left edge when the window is smaller.
+   position: relative lets buttons be placed in canvas coordinates. */
+main {
+  position: relative;
+  margin: auto;
 }
 
 canvas {
   display: block;
+  touch-action: none; /* touch drags place towers instead of scrolling/zooming the page */
 }

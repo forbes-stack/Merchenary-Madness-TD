@@ -4,6 +4,8 @@ class GatlingGunTower extends Tower {
     super(x, y, 100, 7, 0.1, 'gatling'); // <--- Updated super call
     this._shotDuration = 5;   // shorter beam so it doesn't look like a solid line
     this.maxLevel = 3; // Max level for Gatling is 3
+    this.shotSound = 'gatling';
+    this.radius = 20; // footprint: placement spacing + click area
   }
 
   // Green, thin beam
@@ -23,21 +25,21 @@ class GatlingGunTower extends Tower {
     imageMode(CENTER);
 
     if (!this.target) {
-      image(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0);
+      this._sprite(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0);
     } else {
       let dx = this.target.x - this.x;
       let dy = this.target.y - this.y;
 
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 0)
-          image(gatlingTowerImg, this.x, this.y, 80, 70, 200, 0, 200, 0); // right
+          this._sprite(gatlingTowerImg, this.x, this.y, 80, 70, 200, 0, 200, 0); // right
         else
-          image(gatlingTowerImg, this.x, this.y, 80, 70, 400, 0, 225, 0); // left
+          this._sprite(gatlingTowerImg, this.x, this.y, 80, 70, 400, 0, 225, 0); // left
       } else {
         if (dy < 0)
-          image(gatlingTowerImg, this.x, this.y, 80, 70, 100, 0, 100, 0); // back
+          this._sprite(gatlingTowerImg, this.x, this.y, 80, 70, 100, 0, 100, 0); // back
         else
-          image(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0); // front
+          this._sprite(gatlingTowerImg, this.x, this.y, 50, 80, 0, 0, 100, 0); // front
           
       }
     }

@@ -4,6 +4,8 @@ class CannonTower extends Tower {
     super(x, y, 120, 30, 1.5, 'cannon'); // range, damage, rate, type
     this._shotDuration = 12;   // lingers longer to emphasize the big hit
     this.maxLevel = 4;         // Max level for Cannon is 4
+    this.shotSound = 'cannon';
+    this.radius = 24;          // biggest footprint
 
     // Splash properties
     this.splashRadius = 90;    // visual + damage radius
@@ -31,7 +33,7 @@ class CannonTower extends Tower {
     }
 
     // --- Splash to nearby enemies (half damage) ---
-    const splashDamage = Math.floor(this.damage / 1.2);
+    const splashDamage = Math.floor(this.damage / 2);
 
     for (let enemy of allEnemies) {
       if (!enemy || !enemy.alive) continue;
@@ -68,21 +70,21 @@ draw() {
   imageMode(CENTER);
 
   if (!this.target) {
-    image(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0);
+    this._sprite(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0);
   } else {
     let dx = this.target.x - this.x;
     let dy = this.target.y - this.y;
 
     if (Math.abs(dx) > Math.abs(dy)) {
       if (dx > 0)
-        image(cannonTowerImg, this.x, this.y, 80, 80, 200, 0, 200, 0); // right
+        this._sprite(cannonTowerImg, this.x, this.y, 80, 80, 200, 0, 200, 0); // right
       else
-        image(cannonTowerImg, this.x, this.y, 80, 80, 410, 0, 225, 0); // left
+        this._sprite(cannonTowerImg, this.x, this.y, 80, 80, 410, 0, 225, 0); // left
     } else {
       if (dy < 0)
-        image(cannonTowerImg, this.x, this.y, 50, 60, 100, 0, 110, 0);  // back
+        this._sprite(cannonTowerImg, this.x, this.y, 50, 60, 100, 0, 110, 0);  // back
       else
-        image(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0); // front
+        this._sprite(cannonTowerImg, this.x, this.y, 50, 70, 0, 0, 100, 0); // front
     }
   }
     pop();

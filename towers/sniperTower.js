@@ -3,6 +3,8 @@ class SniperTower extends Tower {
     super(x, y, 60, 75, 3, "sniper");
     this._shotDuration = 20;
     this.maxLevel = 3;
+    this.shotSound = 'sniper';
+    this.radius = 16; // footprint: placement spacing + click area
   }
 
   // Green, thin beam
@@ -22,21 +24,21 @@ class SniperTower extends Tower {
     imageMode(CENTER);
 
     if (!this.target) {
-      image(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0);
+      this._sprite(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0);
     } else {
       let dx = this.target.x - this.x;
       let dy = this.target.y - this.y;
 
       if (Math.abs(dx) > Math.abs(dy)) {
         if (dx > 0)
-          image(sniperTowerImg, this.x, this.y, 80, 80, 225, 0, 175, 0); // right
+          this._sprite(sniperTowerImg, this.x, this.y, 80, 80, 225, 0, 175, 0); // right
         else
-          image(sniperTowerImg, this.x, this.y, 110, 80, 380, 0, 225, 0); // left
+          this._sprite(sniperTowerImg, this.x, this.y, 110, 80, 380, 0, 225, 0); // left
       } else {
         if (dy < 0)
-          image(sniperTowerImg, this.x, this.y, 60, 80, 0, 0, 125, 0); // back
+          this._sprite(sniperTowerImg, this.x, this.y, 60, 80, 0, 0, 125, 0); // back
         else
-          image(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0); // front
+          this._sprite(sniperTowerImg, this.x, this.y, 60, 80, 110, 0, 140, 0); // front
       }
     }
 
@@ -64,35 +66,8 @@ class SniperTower extends Tower {
     pop();
   }
 
-  update(enemies, infoTracker) {
-  if (!enemies || enemies.length === 0) return;
-  if (this.cooldown > 0) { this.cooldown--; return; }
-
-  let target = null;
-  let furthestProgress = -Infinity;  // front-most enemy
-
-  for (let enemy of enemies) {
-    if (!enemy || !enemy.alive) continue;
-
-    const d = dist(this.x, this.y, enemy.x, enemy.y);
-
-    // enemy must NOT be inside the minimum range
-    if (d < this.range) continue;
-
-    // choose the enemy furthest along the path
-    if (enemy.pathIndex > furthestProgress) {
-      furthestProgress = enemy.pathIndex;
-      target = enemy;
-    }
+  // Unlimited reach, but enemies must NOT be inside the minimum range
+  inRange(d) {
+    return d >= this.range;
   }
-
-  if (target) {
-    target.takeDamage(this.damage, infoTracker);
-    this.cooldown = Math.ceil(this.rate * 60);
-
-this._lastShotX = target.x;
-this._lastShotY = target.y;
-this._shotTimer = this._shotDuration;
-  }
-}
 }

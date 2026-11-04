@@ -16,13 +16,18 @@ let enemy2;
 //Buttons
 let startWaveButton;
 let pauseButton;      // pause icon button
+let speedButton;      // 1x / 2x toggle (SpeedButton.js)
+let gameSpeed = 1;    // game steps per frame, set by speedButton
 let isPaused = false; // pause flag
+let tutorial;         // guided first round (tutorial.js)
+let showStats = false; // FPS / entity overlay, toggled with the F key
 
 //Icons
 let gattlingIcon;
 let cowboyIcon;
 let cannonIcon;
 let sniperIcon;
+let homeIcon;         // house icon on the Quit to Title buttons
 
 //Towers
 let cowboyTower;
@@ -33,36 +38,64 @@ let cannonTowerImg;
 //Enemies
 let fastEnemyImg;
 let basicEnemyImg;
+let tankEnemyImg;
+let dynamiteEnemyImg;
+let ghostEnemyImg;
+let docEnemyImg;
+let ironcladEnemyImg;
 
 
-function mapPreload() {
-  
+
+// Loads every map image, then calls onDone once all of them have finished
+// (this runs after setup, so p5's preload() can't wait for us)
+function mapPreload(onDone) {
+  let pending = 0;
+  const finished = () => {
+    pending--;
+    if (pending === 0 && onDone) onDone();
+  };
+  const load = (src) => {
+    pending++;
+    return loadImage(src, finished, () => {
+      console.error('failed to load image', src);
+      finished();
+    });
+  };
+
   //Backgrounds
-  bg = loadImage("assets/Wild_West_Bg.png");
-  uiBg = loadImage("assets/woodBack.png");
-  longBg = loadImage("assets/dusty2.jpg");
+  bg = load("assets/Wild_West_Bg.png");
+  uiBg = load("assets/woodBack.png");
+  longBg = load("assets/dusty2.jpg");
 
   //Icons
-  gattlingIcon = loadImage("assets/gattlingIcon.png");
-  cowboyIcon = loadImage("assets/Cowboy_Icon.png");
-  cannonIcon = loadImage("assets/cannonIcon.png");
-  sniperIcon = loadImage("assets/sniperIcon.png");
+  gattlingIcon = load("assets/gattlingIcon.png");
+  cowboyIcon = load("assets/Cowboy_Icon.png");
+  cannonIcon = load("assets/cannonIcon.png");
+  sniperIcon = load("assets/sniperIcon.png");
+  homeIcon = load("assets/home.png");
 
   //Towers
-  cowboyTower = loadImage("assets/basic_tower3.png");
-  sniperTowerImg = loadImage("assets/sniper_tower.png");
-  gatlingTowerImg = loadImage("assets/gatling_tower.png")
-  cannonTowerImg = loadImage("assets/cannon_tower1.png")
+  cowboyTower = load("assets/basic_tower3.png");
+  sniperTowerImg = load("assets/sniper_tower.png");
+  gatlingTowerImg = load("assets/gatling_tower.png")
+  cannonTowerImg = load("assets/cannon_tower1.png")
 
   //Enemies
-  fastEnemyImg = loadImage("assets/fast_enemy.png");
-  basicEnemyImg = loadImage("assets/basic_enemy.png");
-  tankEnemyImg = loadImage("assets/tank_enemy.png")
+  fastEnemyImg = load("assets/fast_enemy.png");
+  basicEnemyImg = load("assets/basic_enemy.png");
+  tankEnemyImg = load("assets/tank_enemy.png")
+
+  //Special enemies (standard grid sheets, see enemies/gridEnemy.js)
+  dynamiteEnemyImg = load("assets/dynamite_enemy.png");
+  ghostEnemyImg = load("assets/ghost_enemy.png");
+  docEnemyImg = load("assets/doc_enemy.png");
+  ironcladEnemyImg = load("assets/ironclad_enemy.png");
 }
 
 
 function mapSetup() {
   createCanvas(1400, 750);
+  canvasLayout.fit(); // scale the bigger map canvas to the window
 
   // Path (polyline points)
   path = new Path([
@@ -94,27 +127,44 @@ function mapSetup() {
                       sniperTowerImg,
                       gatlingTowerImg,
                       cannonTowerImg,
+                      homeIcon,
                     }
                   );
 
+  // Guided tutorial (offered until finished or skipped) and visual effects
+  tutorial = new Tutorial();
+  effects.clear();
+
   // HUD / currency / lives tracker
-  info = new InfoTracker(100, 1);
+  // Round 0 = no wave started yet (the HUD shows it as Round 1)
+  info = new InfoTracker(100, 0);
 
   // Create Pause + Start Wave buttons
   createTopButtons();
+
+  // 1x / 2x speed toggle, drawn on the canvas just left of the Pause button
+  speedButton = new SpeedButton(width - 320, 40, 50, 40);
+
+  // the strip behind the speed / Pause / Start Wave controls: no towers there,
+  // and tower menus don't open underneath it
+  ui.reservedRects.push({ x: width - 325, y: 0, w: 255, h: 85 });
 
   // Wave manager, but DO NOT auto-start the first wave
   waveManager = new WaveManager(path);
 
   // Start in "waiting for player" state so Wave 1 starts only after button press
   waveManager.waitingForPlayer = true;
+
+  // Western music loop (stops on Game Over, starts again on Restart)
+  sfx.startMusic();
 }
 
 function mapDraw() {
   background('white');
 
   // Show or hide Start Wave button based on WaveManager + state
-  if (waveManager && waveManager.waitingForPlayer && !isPaused && !info.isGameOver) {
+  if (waveManager && waveManager.waitingForPlayer && !isPaused && !info.isGameOver &&
+      !tutorial.blocksWaveStart()) {
     startWaveButton.show();
   } else {
     startWaveButton.hide();
@@ -133,11 +183,10 @@ function mapDraw() {
     if (pauseButton) pauseButton.hide();
 
     // Draw background like a frozen game state
-    image(bg, 0, 0, width, height - 250);
-    image(longBg, 0, height - 250, width, 250);
+    drawMapBackground();
 
     // Draw HUD so player still sees final stats
-    info.draw();
+    info.draw(ui.placedTowers.length);
 
     // Draw Game Over overlay + Restart button
     ui.displayGameOver();
@@ -149,19 +198,20 @@ function mapDraw() {
   // --- Paused state ---
   if (isPaused) {
     // Draw current game state without updating logic
-    image(bg, 0, 0, width, height - 250);
-    image(longBg, 0, height - 250, width, 250);
+    drawMapBackground();
 
     // Draw towers without updating them: pass null so t.update(...) is skipped
-    ui.display(info, null);
+    ui.display(info, null, false);
 
     // Draw enemies at their last positions (no update)
     if (waveManager) {
       waveManager.draw();
     }
+    effects.draw();
 
     // HUD
-    info.draw();
+    info.draw(ui.placedTowers.length);
+    speedButton.draw();
 
     // Pause overlay with Resume / Restart
     ui.displayPauseMenu();
@@ -172,8 +222,14 @@ function mapDraw() {
   // --- Normal game loop ---
 
   // Background
-  image(bg, 0, 0, width, height - 250);
-  image(longBg, 0, height - 250, width, 250);
+  drawMapBackground();
+
+  // Extra game steps when sped up (2x runs the game logic twice per frame)
+  for (let step = 1; step < gameSpeed; step++) {
+    ui.updateTowers(waveManager.activeEnemies, info);
+    waveManager.update(info);
+    effects.update();
+  }
 
   // UI draws palette, placed towers, and updates towers against enemies
   ui.display(info, waveManager.activeEnemies);
@@ -182,26 +238,94 @@ function mapDraw() {
   waveManager.update(info);
   waveManager.draw();
 
+  // Dust, floating costs, sparkles
+  effects.update();
+  effects.draw();
+
+  // Tutorial prompts (after ui.display so upgrade button positions are known)
+  tutorial.update(ui, info);
+  tutorial.draw(ui, info);
+
   // HUD
-  info.draw();
+  info.draw(ui.placedTowers.length);
+  speedButton.draw();
+  if (showStats) drawStats();
+}
+
+// Rolling average of frame times for the stats overlay
+let frameTimes = [];
+
+/**
+ * Performance overlay (F key): FPS, frame time, and what's on screen.
+ */
+function drawStats() {
+  frameTimes.push(deltaTime);
+  if (frameTimes.length > 60) frameTimes.shift();
+  const avgMs = frameTimes.reduce((a, b) => a + b, 0) / frameTimes.length;
+
+  const lines = [
+    `FPS: ${Math.round(1000 / avgMs)}`,
+    `Frame: ${avgMs.toFixed(1)} ms`,
+    `Enemies: ${waveManager.activeEnemies.length}`,
+    `Towers: ${ui.placedTowers.length}`,
+    `Effects: ${effects.items.length}`,
+    `Speed: ${gameSpeed}x`,
+  ];
+
+  push();
+  rectMode(CORNER);
+  fill(0, 0, 0, 170);
+  noStroke();
+  rect(8, 8, 150, 18 * lines.length + 12, 6);
+  fill(255);
+  textAlign(LEFT, TOP);
+  textSize(14);
+  textFont('monospace');
+  lines.forEach((l, i) => text(l, 16, 14 + i * 18));
+  pop();
+}
+
+/**
+ * Back to the start screen. Reloading the page is the cleanest reset, since the
+ * game's scripts replace the start screen's input handlers when they load.
+ * Settings are saved in the browser, so they survive the reload.
+ */
+function quitToTitle() {
+  sfx.stopMusic();
+  location.reload();
+}
+
+/**
+ * Map art and the bottom strip behind the palette.
+ */
+function drawMapBackground() {
+  image(bg, 0, 0, width, height - 250);
+  image(longBg, 0, height - 250, width, 250);
 }
 
 // Forward mouse events to UI so TowerDragger can do its thing
 function mousePressed() {
   // If game is over, check only the restart button
   if (info && info.isGameOver) {
-    ui.handleGameOverClick(restartGame);
+    ui.handleGameOverClick(restartGame, quitToTitle);
     return;
   }
 
-  // If paused, click goes to pause menu (Resume / Restart)
+  // If paused, click goes to pause menu (Resume / Restart / Quit to Title)
   if (isPaused) {
     ui.handlePauseClick(
       () => { isPaused = false; }, // resume callback
-      restartGame                  // restart callback (same as Game Over)
+      restartGame,                 // restart callback (same as Game Over)
+      quitToTitle
     );
     return;
   }
+
+  // Tutorial panel buttons (Show me / Skip / Got it)
+  if (tutorial.handleClick()) return;
+
+  // 1x / 2x toggle
+  if (speedButton.handleClick(mouseX, mouseY)) return;
 
   ui.mousePressed(info);
 }
@@ -218,22 +342,38 @@ function mouseReleased() {
   ui.mouseReleased(info); // pass InfoTracker so the dragger can charge
 }
 
+// Touch: a finger works like the mouse (tap = click, drag = drag a tower).
+// For touches on the canvas, returning false stops the browser from also sending
+// emulated mouse events (which would click twice, e.g. buy an upgrade twice) and
+// from scrolling the page. Touches on HTML buttons keep their normal behavior.
+function touchOnCanvas(e) {
+  return e && e.target && e.target.tagName === 'CANVAS';
+}
+
+function touchStarted(e) {
+  mousePressed();
+  if (touchOnCanvas(e)) return false;
+}
+
+function touchMoved(e) {
+  mouseDragged();
+  if (touchOnCanvas(e)) return false;
+}
+
+function touchEnded(e) {
+  mouseReleased();
+  if (touchOnCanvas(e)) return false;
+}
+
 /**
  * Create Pause icon + Start Wave button at the top-right area,
  * with some breathing room from the corner.
  */
 function createTopButtons() {
-  const topY = 40;
   const buttonHeight = 40;
-
-  // Base X a bit away from the right edge so nothing feels crammed
-  const baseX = width - 260; // left-most button x
 
   // --- Pause icon button (left of Start Wave) ---
   pauseButton = createButton("⏸"); // Unicode pause icon
-  pauseButton.position(baseX, topY);
-  pauseButton.size(40, buttonHeight);
-  pauseButton.style("font-size", "20px");
   pauseButton.style("background-color", "#444");
   pauseButton.style("color", "white");
   pauseButton.style("border", "2px solid #222");
@@ -247,11 +387,8 @@ function createTopButtons() {
 
   // --- Start Wave button (shifted left, to the right of the icon) ---
   startWaveButton = createButton("Start Wave");
-  startWaveButton.position(baseX + 50, topY);  // moved left vs old width-130
-  startWaveButton.size(130, buttonHeight);
 
   // Styling
-  startWaveButton.style("font-size", "16px");
   startWaveButton.style("background-color", "#c97a2b");
   startWaveButton.style("color", "white");
   startWaveButton.style("border", "2px solid #603814");
@@ -262,6 +399,15 @@ function createTopButtons() {
   startWaveButton.mousePressed(() => {
     waveManager.startNextWave(info); // this will start Wave 1 the first time
   });
+
+  // Placed in canvas coordinates; canvasLayout scales them with the canvas
+  const topY = 40;
+
+  // Base X a bit away from the right edge so nothing feels crammed
+  const baseX = width - 260; // left-most button x
+
+  canvasLayout.place(pauseButton, baseX, topY, 40, buttonHeight, 20);
+  canvasLayout.place(startWaveButton, baseX + 50, topY, 130, buttonHeight, 16);  // moved left vs old width-130
 }
 
 /**
@@ -276,12 +422,19 @@ function restartGame() {
   ui.placedTowers = [];
   ui.selectedTower = null;
 
-  // Clear pause state
+  effects.clear();
+  tutorial.onRestart();
+
+  // Clear pause state and go back to normal speed
   isPaused = false;
+  speedButton.isFast = false;
+  gameSpeed = 1;
 
   // Reset WaveManager and start fresh, waiting for player again
   waveManager = new WaveManager(path);
   waveManager.waitingForPlayer = true;
+
+  sfx.startMusic();
 }
 
 // Toggle pause with the P key (still supported)
@@ -291,5 +444,10 @@ function keyPressed() {
     if (!info.isGameOver) {
       isPaused = !isPaused;
     }
+  }
+
+  // Toggle the FPS / entity overlay with the F key
+  if (key === 'f' || key === 'F') {
+    showStats = !showStats;
   }
 }
