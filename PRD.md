@@ -82,7 +82,7 @@ Rate is the time between shots (the game runs at 60 frames per second). Footprin
 | F-1.4.3 | Towers are placed by dragging from the palette to the map. | Done | |
 | F-1.4.4 | Clicking a placed tower selects it, shows its range, and opens its upgrade menu. | Done | The menu is a ring of four round icon buttons around the tower: ⚔ upgrade damage (top), ⏱ upgrade rate (right), ◎ targeting mode (left), $ sell (bottom). Each shows its price or state underneath (🔒 Locked / ★ MAX on the button itself), and hovering shows a short label. Near edges and corners the buttons fan out toward the middle of the map instead (half circle, quarter circle, or a straight line), so they always stay on screen, never overlap, and never sit under the top-right controls (checked at every placeable spot for all 4 towers). Clicking empty ground deselects. |
 | F-1.4.5 | Each tower has two upgrade paths: **Damage** and **Rate**. | Done | Both paths have 3 levels |
-| F-1.4.6 | Upgrade costs | Done | Damage: $60 / $180 / $300 (×1.5 / ×2.5 / ×3.0 damage, compounding). Rate: $50 / $100 / $250 (×0.80 / ×0.60 / ×0.50 time between shots, compounding). All towers share the same upgrade tables. |
+| F-1.4.6 | Upgrade costs | Done | Damage: $120 / $360 / $600 (×1.5 / ×2.5 / ×3.0 damage, compounding). Rate: $100 / $200 / $500 (×0.80 / ×0.60 / ×0.50 time between shots, compounding). All towers share the same upgrade tables. |
 | F-1.4.7 | Buying the first upgrade on one path locks the opposite path. | Done | A tower follows a single path for all 3 levels |
 | F-1.4.8 | Towers can be sold. | Done | Refund is 50% of the total spent (purchase plus upgrades) |
 | F-1.4.9 | Towers differ in size. | Done | Each tower has its own footprint (see table) for placement spacing and click area |
@@ -106,7 +106,7 @@ Speed is in pixels per frame.
 | Doc (regen) | 200 | 0.8 | 8 | Round 11 |
 | Ironclad (armored) | 300 | 0.7 | 12 | Round 14 |
 
-**Economy (rebalanced after playtesting):** start with $125; towers $25–$85; upgrades: damage $60 / $180 / $300, rate $50 / $100 / $250; bounties above; wave clear $20 + $3 × round. If every enemy is killed, income per wave is about $38 (round 1), $60 (2), $82 (3), $114 (4), $208 (5), and $701 (10), so early on the player can afford roughly one new tower or upgrade per wave.
+**Economy (rebalanced after playtesting):** start with $125; towers $25–$85; upgrades: damage $120 / $360 / $600, rate $100 / $200 / $500; bounties above; wave clear $20 + $3 × round. If every enemy is killed, income per wave is about $38 (round 1), $60 (2), $82 (3), $114 (4), $208 (5), and $701 (10), so early on the player can afford roughly one new tower or upgrade per wave.
 
 Special abilities:
 
@@ -179,7 +179,7 @@ Before optimizing, a 365-enemy frame spent 51.6 ms drawing enemies: ~46 µs per 
 |---|---|---|---|
 | NF-2.2.1 | Buttons and menus are clearly labeled and sized for mouse and touch. | Done | The game scales to fit any window (up to 2×) with its buttons, sliders, and menus scaled to match (`functions/layout.js`), so there is no scrolling on laptops. Touch: tap = click, drag = place a tower; touches on the canvas don't scroll the page or double-click. Tested with simulated touch events; still worth checking on a real tablet. |
 | NF-2.2.2 | A tutorial new players can complete without outside help. | Done | Guided tutorial during round 1 (`functions/tutorial.js`): offered on the first game; steps wait for the player (place a Cowboy → Start Wave → select the tower → buy an upgrade) with a bouncing arrow and a suggested spot. Start Wave stays hidden until a tower is placed. Skippable at any step; **Settings → Tutorial → Replay** offers it again. Plus the How to Play screen (F-1.1.8). |
-| NF-2.2.3 | Visual feedback when towers are placed or upgrades bought. | Done | Dust puff when a tower lands, floating cost text ("-$25" on place, "-$50" on upgrade, "+$12" on sell), gold sparkle on upgrade, 3 level pips under every tower (`functions/effects.js`), and an upgrade glow that traces each upgraded tower's own outline: red-orange on the damage path, electric blue on the rate path, brighter at each level, gently pulsing, with rising sparks at level 3. Each sprite frame's glow is pre-blurred once and cached (`Tower._sprite`, `UI.drawTowerWithAura`); live canvas blur made frames 4× slower. |
+| NF-2.2.3 | Visual feedback when towers are placed or upgrades bought. | Done | Dust puff when a tower lands, floating cost text ("-$25" on place, "-$100" on upgrade, "+$12" on sell), gold sparkle on upgrade, 3 level pips under every tower (`functions/effects.js`), and an upgrade glow that traces each upgraded tower's own outline: red-orange on the damage path, electric blue on the rate path, brighter at each level, gently pulsing, with rising sparks at level 3. Each sprite frame's glow is pre-blurred once and cached (`Tower._sprite`, `UI.drawTowerWithAura`); live canvas blur made frames 4× slower. |
 | NF-2.2.4 | Audio feedback for placing towers and buying upgrades. | Done | Place, upgrade, and sell sounds (see X-4) |
 
 ### 2.3 Accessibility

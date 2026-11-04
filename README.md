@@ -49,8 +49,8 @@ New to the game? A short guided tutorial runs during your first round, and **How
 
 Each mercenary has two upgrade paths with three levels each:
 
-- **Damage:** hits harder ($60 → $180 → $300)
-- **Rate:** fires faster ($50 → $100 → $250)
+- **Damage:** hits harder ($120 → $360 → $600)
+- **Rate:** fires faster ($100 → $200 → $500)
 
 Click a placed tower to open its menu: a ring of buttons around it for ⚔ damage, ⏱ rate, ◎ targeting, and $ sell. Hover a button to see what it does.
 

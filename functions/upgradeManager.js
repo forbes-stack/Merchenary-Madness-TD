@@ -1,16 +1,16 @@
 class UpgradeManager {
     constructor() {
 const createDamagePath = () => [
-      { cost: 60, damageMod: 1.5, rateMod: 1.0, label: "Dmg Lvl 1" },
-      { cost: 180, damageMod: 2.5, rateMod: 1.0, label: "Dmg Lvl 2" },
-      { cost: 300, damageMod: 3.0, rateMod: 1.0, label: "Dmg Lvl 3" }
+      { cost: 120, damageMod: 1.5, rateMod: 1.0, label: "Dmg Lvl 1" },
+      { cost: 360, damageMod: 2.5, rateMod: 1.0, label: "Dmg Lvl 2" },
+      { cost: 600, damageMod: 3.0, rateMod: 1.0, label: "Dmg Lvl 3" }
     ];
 
     // Rate Path: smaller rateMod = less time between shots (faster)
     const createRatePath = () => [
-      { cost: 50, damageMod: 1.0, rateMod: 0.80, label: "Rate Lvl 1" },
-      { cost: 100, damageMod: 1.0, rateMod: 0.60, label: "Rate Lvl 2" },
-      { cost: 250, damageMod: 1.0, rateMod: 0.50, label: "Rate Lvl 3" }
+      { cost: 100, damageMod: 1.0, rateMod: 0.80, label: "Rate Lvl 1" },
+      { cost: 200, damageMod: 1.0, rateMod: 0.60, label: "Rate Lvl 2" },
+      { cost: 500, damageMod: 1.0, rateMod: 0.50, label: "Rate Lvl 3" }
     ];
 
     this.upgrades = {
