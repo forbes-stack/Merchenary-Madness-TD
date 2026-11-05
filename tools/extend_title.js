@@ -1,11 +1,11 @@
-// Builds assets/start_wide.png: the title-screen drawing (assets/start.png) extended
+// Builds assets/backgrounds/title_wide.png: the title-screen drawing (assets/backgrounds/title.png) extended
 // outward so it can fill any window shape without stretching. The original drawing is
 // copied pixel-for-pixel into the center; around it the sky and the four sand bands are
 // continued from the drawing's own edges with gentle dune curves, and copies of the
 // drawing's own clouds and cacti are scattered over the new area.
 //
 // Usage (from the repo root): node tools/extend_title.js
-// The page uses the same sizes (see TITLE_BG in functions/layout.js).
+// The page uses the same sizes (see TITLE_BG in src/core/layout.js).
 const { readPNG, writePNG } = require("./png.js");
 const path = require("path");
 
@@ -14,7 +14,7 @@ const CANVAS_W = 700, CANVAS_H = 650; // title canvas the drawing sits in
 const OX = (W - CANVAS_W) / 2;     // where the canvas (and drawing) sits in the output
 const OY = (H - CANVAS_H) / 2;
 
-const src = readPNG(path.join(__dirname, "..", "assets", "start.png"));
+const src = readPNG(path.join(__dirname, "..", "assets", "backgrounds", "title.png"));
 const out = Buffer.alloc(W * H * 4);
 
 const SKY = [122, 106, 186];
@@ -180,6 +180,6 @@ for (const row of [{ y: OY + 470, gap: 150 }, { y: OY + 560, gap: 190 }]) {
   }
 }
 
-writePNG(path.join(__dirname, "..", "assets", "start_wide.png"), W, H, out);
-console.log(`wrote assets/start_wide.png ${W}x${H}: ${clouds.length} cloud + ${cacti.length} cactus shapes found, ` +
+writePNG(path.join(__dirname, "..", "assets", "backgrounds", "title_wide.png"), W, H, out);
+console.log(`wrote assets/backgrounds/title_wide.png ${W}x${H}: ${clouds.length} cloud + ${cacti.length} cactus shapes found, ` +
   `${placedClouds} clouds + ${placedCacti} cacti placed; band tops left ${leftTops}, right ${rightTops}`);

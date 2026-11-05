@@ -2,7 +2,7 @@
 //     quit_button
 
 // function preload() {
-//   gameover = loadImage('assets/gameover.png')
+//   gameover = loadImage('assets/screens/gameover.png')
 // }
 
 // function setup() {
@@ -30,20 +30,20 @@ const IS_DESKTOP_APP = /Electron/i.test(navigator.userAgent);
 let showSplash = !IS_DESKTOP_APP;
 
     //each js script for map.js (order matters: base classes before subclasses)
-let sources = ['enemies/enemy.js','enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
-                'enemies/gridEnemy.js', 'enemies/dynamiteEnemy.js', 'enemies/ghostEnemy.js', 'enemies/docEnemy.js', 'enemies/ironcladEnemy.js',
-                'towers/tower.js','towers/gatlingTower.js', 'towers/cannonTower.js', 'towers/sniperTower.js',
-                'functions/path.js', 'functions/towerDragger.js','functions/upgradeManager.js',
-                'bottomUI/ui.js', 'bottomUI/infoTracker.js',
-                'functions/waveGenerator.js', 'functions/SpeedButton.js', 'functions/effects.js', 'functions/tutorial.js',
-                'functions/map.js'
+let sources = ['src/enemies/enemy.js','src/enemies/basicEnemy.js', 'src/enemies/fastEnemy.js', 'src/enemies/tankEnemy.js',
+                'src/enemies/gridEnemy.js', 'src/enemies/dynamiteEnemy.js', 'src/enemies/ghostEnemy.js', 'src/enemies/docEnemy.js', 'src/enemies/ironcladEnemy.js',
+                'src/towers/tower.js','src/towers/gatlingTower.js', 'src/towers/cannonTower.js', 'src/towers/sniperTower.js',
+                'src/game/path.js', 'src/game/towerDragger.js','src/game/upgradeManager.js',
+                'src/ui/ui.js', 'src/ui/infoTracker.js',
+                'src/game/waveGenerator.js', 'src/game/speedButton.js', 'src/core/effects.js', 'src/game/tutorial.js',
+                'src/game/map.js'
 
               ]
 let page = 'home';
 
 function preload() {
-  img = loadImage('assets/start.png')
-  img3 = loadImage('assets/home.png')
+  img = loadImage('assets/backgrounds/title.png')
+  img3 = loadImage('assets/icons/home.png')
   settingsPreload()
   howToPlayPreload()
 }

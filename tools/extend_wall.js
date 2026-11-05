@@ -1,5 +1,5 @@
-// Builds assets/settings_wide.png: the wood-plank wall behind the Settings and How to Play
-// pages (assets/settings_bg.png) extended outward so it can fill any window shape without
+// Builds assets/backgrounds/wall_wide.png: the wood-plank wall behind the Settings and How to Play
+// pages (assets/backgrounds/wall.png) extended outward so it can fill any window shape without
 // stretching, the same way tools/extend_title.js extends the title drawing.
 //
 // The pages show the center 700x650 of the 1158x650 wall; that exact region sits in the
@@ -17,7 +17,7 @@ const W = 2600, H = 1050;              // same size as start_wide.png (see TITLE
 const CANVAS_W = 700, CANVAS_H = 650;
 const OX = (W - CANVAS_W) / 2, OY = (H - CANVAS_H) / 2;
 
-const src = readPNG(path.join(__dirname, "..", "assets", "settings_bg.png"));
+const src = readPNG(path.join(__dirname, "..", "assets", "backgrounds", "wall.png"));
 const CROP_X = (src.w - CANVAS_W) / 2;   // the pages draw the wall's center 700px
 const FLOOR_TOP = 611;                   // first row below the dark seam under the planks
 // Dark seams between planks near the wall's left and right ends (column-darkness minima);
@@ -48,5 +48,5 @@ for (let Y = 0; Y < H; Y++) {
   }
 }
 
-writePNG(path.join(__dirname, "..", "assets", "settings_wide.png"), W, H, out);
-console.log(`wrote assets/settings_wide.png ${W}x${H} (wall ${src.w}x${src.h}, center crop x ${CROP_X}, floor from y ${FLOOR_TOP})`);
+writePNG(path.join(__dirname, "..", "assets", "backgrounds", "wall_wide.png"), W, H, out);
+console.log(`wrote assets/backgrounds/wall_wide.png ${W}x${H} (wall ${src.w}x${src.h}, center crop x ${CROP_X}, floor from y ${FLOOR_TOP})`);

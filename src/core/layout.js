@@ -7,7 +7,7 @@
 // HTML controls are placed with canvasLayout.place(el, x, y, w, h, fontSize) in canvas
 // coordinates and re-scaled whenever the window changes size.
 
-// The title screen's backdrop (assets/start_wide.png, made by tools/extend_title.js) is
+// The title screen's backdrop (assets/backgrounds/title_wide.png, made by tools/extend_title.js) is
 // the title drawing extended outward. It is scaled with the canvas and centered on it,
 // so around the canvas the drawing simply continues instead of black bars.
 const TITLE_BG = { w: 2600, h: 1050 };

@@ -619,7 +619,7 @@ class UI {
     this.drawQuitButton(this.quitButton);
   }
 
-  /** Brown "Quit to Title" button with the house icon (assets/home.png). */
+  /** Brown "Quit to Title" button with the house icon (assets/icons/home.png). */
   drawQuitButton(b) {
     push();
     rectMode(CORNER);
