@@ -4,7 +4,7 @@
 //
 // Sheet layout (standard grid): 2 columns (walk frames) x 4 rows (down, left, right, up),
 // each cell 120x200 px.
-// Usage (from the repo root): node tools/gen_sprites.js assets [preview.png]
+// Usage (from the repo root): node tools/gen_sprites.js assets/enemies [preview.png]
 const { writePNG } = require("./png.js");
 const path = require("path");
 
@@ -182,7 +182,7 @@ const C = {
 };
 
 const characters = {
-  dynamite_enemy: {
+  dynamite: {
     o: {
       skin: C.skin, hair: [[38, 20, 4], [60, 32, 4], [79, 41, 3]],
       pants: [[50, 58, 70], [70, 80, 95], [95, 105, 120]], pantsPattern: "streaks",
@@ -223,7 +223,7 @@ const characters = {
     },
   },
 
-  ghost_enemy: {
+  ghost: {
     o: {
       skin: [[150, 158, 170], [200, 205, 212], [225, 228, 232]], hair: [[60, 62, 70], [85, 88, 96], [110, 112, 120]],
       pants: [[45, 47, 52], [66, 68, 74], [90, 92, 98]], pantsPattern: null,
@@ -260,7 +260,7 @@ const characters = {
     },
   },
 
-  doc_enemy: {
+  doc: {
     o: {
       skin: C.skin, hair: [[90, 90, 92], [130, 130, 132], [170, 170, 172]],
       pants: [[70, 66, 62], [100, 95, 90], [125, 120, 114]], pantsPattern: "streaks",
@@ -297,7 +297,7 @@ const characters = {
     },
   },
 
-  ironclad_enemy: {
+  ironclad: {
     o: {
       skin: [[90, 95, 100], [140, 145, 150], [190, 195, 200]], hair: [[90, 95, 100], [140, 145, 150], [190, 195, 200]],
       pants: [[80, 84, 90], [125, 130, 136], [170, 175, 180]], pantsPattern: "plates",

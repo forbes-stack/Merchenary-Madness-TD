@@ -7,12 +7,12 @@ html, body {
 
 body {
   display: flex;
-  overflow: hidden; /* the game is scaled to fit the window (functions/layout.js) */
+  overflow: hidden; /* the game is scaled to fit the window (src/core/layout.js) */
   /* The game keeps its shape, so windows of a different shape leave space around it;
      fill that with the game's dusty desert texture, darkened so the game stands out. */
   background:
     linear-gradient(rgba(0, 0, 0, 0.55), rgba(0, 0, 0, 0.55)),
-    url("assets/dusty2.jpg") center / cover no-repeat;
+    url("assets/backgrounds/dusty.jpg") center / cover no-repeat;
 }
 
 /* margin: auto centers the game, but unlike justify-content/align-items it
@@ -25,19 +25,19 @@ main {
 }
 
 /* Title screen: instead of bars, the title drawing continues past the canvas edges
-   (assets/start_wide.png, sized to match the canvas by functions/layout.js). Sky and
+   (assets/backgrounds/title_wide.png, sized to match the canvas by src/core/layout.js). Sky and
    sand colors cover anything beyond even that, on extremely wide or tall windows. */
 body.title-screen {
   background:
-    url("assets/start_wide.png") center / var(--title-bg-size, auto) no-repeat,
+    url("assets/backgrounds/title_wide.png") center / var(--title-bg-size, auto) no-repeat,
     linear-gradient(to bottom, rgb(122, 106, 186) 50%, rgb(194, 185, 143) 50%);
 }
 
 /* Settings / How to Play: the wood-plank wall continues past the canvas edges
-   (assets/settings_wide.png, made by tools/extend_wall.js, same size and layout). */
+   (assets/backgrounds/wall_wide.png, made by tools/extend_wall.js, same size and layout). */
 body.wood-screen {
   background:
-    url("assets/settings_wide.png") center / var(--title-bg-size, auto) no-repeat,
+    url("assets/backgrounds/wall_wide.png") center / var(--title-bg-size, auto) no-repeat,
     rgb(90, 55, 25);
 }
 

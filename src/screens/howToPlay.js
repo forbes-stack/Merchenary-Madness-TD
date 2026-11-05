@@ -7,17 +7,17 @@ let howToBackButton = null;
 
 function howToPlayPreload() {
   const load = (key, file) => { howToImgs[key] = loadImage('assets/' + file) };
-  load('cowboy', 'Cowboy_Icon.png')
-  load('gatling', 'gattlingIcon.png')
-  load('cannon', 'cannonIcon.png')
-  load('sniper', 'sniperIcon.png')
-  load('basic', 'basic_enemy.png')
-  load('fast', 'fast_enemy.png')
-  load('tank', 'tank_enemy.png')
-  load('dynamite', 'dynamite_enemy.png')
-  load('ghost', 'ghost_enemy.png')
-  load('doc', 'doc_enemy.png')
-  load('ironclad', 'ironclad_enemy.png')
+  load('cowboy', 'icons/cowboy.png')
+  load('gatling', 'icons/gatling.png')
+  load('cannon', 'icons/cannon.png')
+  load('sniper', 'icons/sniper.png')
+  load('basic', 'enemies/bandit.png')
+  load('fast', 'enemies/runner.png')
+  load('tank', 'enemies/brute.png')
+  load('dynamite', 'enemies/dynamite.png')
+  load('ghost', 'enemies/ghost.png')
+  load('doc', 'enemies/doc.png')
+  load('ironclad', 'enemies/ironclad.png')
 }
 
 function openHowToPlay(onBack) {

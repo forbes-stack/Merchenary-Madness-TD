@@ -16,7 +16,7 @@ let enemy2;
 //Buttons
 let startWaveButton;
 let pauseButton;      // pause icon button
-let speedButton;      // 1x / 2x / 3x speed button (SpeedButton.js)
+let speedButton;      // 1x / 2x / 3x speed button (speedButton.js)
 let gameSpeed = 1;    // game steps per frame, set by speedButton
 let isPaused = false; // pause flag
 
@@ -68,33 +68,33 @@ function mapPreload(onDone) {
   };
 
   //Backgrounds
-  bg = load("assets/Wild_West_Bg.png");
-  uiBg = load("assets/woodBack.png");
-  longBg = load("assets/dusty2.jpg");
+  bg = load("assets/backgrounds/map.png");
+  uiBg = load("assets/backgrounds/wood_panel.png");
+  longBg = load("assets/backgrounds/dusty.jpg");
 
   //Icons
-  gattlingIcon = load("assets/gattlingIcon.png");
-  cowboyIcon = load("assets/Cowboy_Icon.png");
-  cannonIcon = load("assets/cannonIcon.png");
-  sniperIcon = load("assets/sniperIcon.png");
-  homeIcon = load("assets/home.png");
+  gattlingIcon = load("assets/icons/gatling.png");
+  cowboyIcon = load("assets/icons/cowboy.png");
+  cannonIcon = load("assets/icons/cannon.png");
+  sniperIcon = load("assets/icons/sniper.png");
+  homeIcon = load("assets/icons/home.png");
 
   //Towers
-  cowboyTower = load("assets/basic_tower3.png");
-  sniperTowerImg = load("assets/sniper_tower.png");
-  gatlingTowerImg = load("assets/gatling_tower.png")
-  cannonTowerImg = load("assets/cannon_tower1.png")
+  cowboyTower = load("assets/towers/cowboy.png");
+  sniperTowerImg = load("assets/towers/sniper.png");
+  gatlingTowerImg = load("assets/towers/gatling.png")
+  cannonTowerImg = load("assets/towers/cannon.png")
 
   //Enemies
-  fastEnemyImg = load("assets/fast_enemy.png");
-  basicEnemyImg = load("assets/basic_enemy.png");
-  tankEnemyImg = load("assets/tank_enemy.png")
+  fastEnemyImg = load("assets/enemies/runner.png");
+  basicEnemyImg = load("assets/enemies/bandit.png");
+  tankEnemyImg = load("assets/enemies/brute.png")
 
-  //Special enemies (standard grid sheets, see enemies/gridEnemy.js)
-  dynamiteEnemyImg = load("assets/dynamite_enemy.png");
-  ghostEnemyImg = load("assets/ghost_enemy.png");
-  docEnemyImg = load("assets/doc_enemy.png");
-  ironcladEnemyImg = load("assets/ironclad_enemy.png");
+  //Special enemies (standard grid sheets, see src/enemies/gridEnemy.js)
+  dynamiteEnemyImg = load("assets/enemies/dynamite.png");
+  ghostEnemyImg = load("assets/enemies/ghost.png");
+  docEnemyImg = load("assets/enemies/doc.png");
+  ironcladEnemyImg = load("assets/enemies/ironclad.png");
 }
 
 

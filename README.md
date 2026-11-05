@@ -110,31 +110,48 @@ The game scales to fit the browser window and works with touch (tap and drag) on
 ## Project Structure
 
 ```
-index.html            Entry point (loads p5.js and the start screen)
-style.css             Page layout
-pages/STARTPAGE.js    Title screen; loads the game when Start is pressed
-pages/settings.js     Settings screen: volume sliders, color-blind mode, replay tutorial
-pages/howToPlay.js    How to Play screen
-functions/tutorial.js Guided first-round tutorial
-functions/effects.js  Dust, floating cost text, upgrade sparkles
-functions/titleAmbience.js  Title-screen wind, dust, and tumbleweeds
-functions/gameSettings.js  Saved player settings and the color-blind palettes
-functions/soundFX.js  Synthesized sound effects, menu + gameplay music, and title-screen wind (Web Audio)
-functions/map.js      Main game loop: setup, drawing, input, pause, and restart
-functions/            Path, wave generation, tower dragging, upgrades
-towers/               Tower base class and the Gatling, Cannon, and Sniper towers
-enemies/              Enemy base classes (enemy.js, gridEnemy.js) and all 7 enemies
-bottomUI/             Tower palette and upgrade menu (ui.js), plus the gold/health/round HUD (infoTracker.js)
-assets/               Sprites and backgrounds
-tools/gen_sprites.js  Generates the special-enemy sprite sheets (node tools/gen_sprites.js assets)
-tools/serve.js        Tiny local web server for playing/testing (node tools/serve.js [port])
-tools/extend_title.js Builds assets/start_wide.png, the title drawing extended to fill wide screens
-tools/extend_wall.js  Builds assets/settings_wide.png, the Settings / How to Play wall extended the same way
-functions/layout.js   Scales the game to fit the window
-PRD.md                Requirements, implementation status, and known issues
+index.html               Entry point (loads p5.js and the start screen); must stay at the root for GitHub Pages
+style.css                Page layout and the full-window backdrops
+src/
+  core/                  Shared building blocks
+    layout.js            Scales the game to fit the window
+    gameSettings.js      Saved player settings and the color-blind palettes
+    soundFX.js           Synthesized sound effects, music, and title-screen wind (Web Audio)
+    effects.js           Dust, floating cost text, upgrade sparkles
+  screens/               Everything outside the battle
+    startPage.js         Title screen; loads the game when Start is pressed
+    settings.js          Settings: volume sliders, color-blind mode, replay tutorial
+    howToPlay.js         How to Play screen
+    titleAmbience.js     Title-screen wind, dust, and tumbleweeds
+  game/                  The battle itself
+    map.js               Main game loop: setup, drawing, input, pause, and restart
+    path.js              The trail the outlaws walk
+    waveGenerator.js     Builds each wave (counts, specials, health/speed boosts)
+    towerDragger.js      Dragging towers from the palette onto the map
+    upgradeManager.js    Upgrade paths and costs
+    tutorial.js          Guided first-round tutorial
+    speedButton.js       1x / 2x / 3x speed button
+  ui/
+    ui.js                Tower palette, ring upgrade menu, pause menu
+    infoTracker.js       Gold / health / round HUD, tower slots
+  towers/                Tower base class and the Gatling, Cannon, and Sniper towers
+  enemies/               Enemy base classes (enemy.js, gridEnemy.js) and all 7 outlaws
+assets/
+  backgrounds/           Map, title, and wood-wall backdrops (title_wide / wall_wide are built by tools/)
+  towers/                Tower sprites
+  icons/                 Palette icons and the home icon
+  enemies/               Outlaw sprite sheets
+  screens/               Game-over art
+docs/PRD.md              Requirements, implementation status, and known issues
+tools/
+  serve.js               Tiny local web server for playing/testing (node tools/serve.js [port])
+  gen_sprites.js         Generates the special-enemy sprite sheets (node tools/gen_sprites.js assets/enemies)
+  extend_title.js        Builds assets/backgrounds/title_wide.png, the title drawing extended to fill wide screens
+  extend_wall.js         Builds assets/backgrounds/wall_wide.png, the Settings / How to Play wall extended the same way
+  png.js                 PNG reader/writer used by the tools
 ```
 
-See [PRD.md](PRD.md) for the full feature list, exact stats, and what's still on the roadmap.
+See [docs/PRD.md](docs/PRD.md) for the full feature list, exact stats, and what's still on the roadmap.
 
 ---
 

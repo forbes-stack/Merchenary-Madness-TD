@@ -14,7 +14,7 @@ const SETTINGS_W = 700;
 const SETTINGS_H = 650;
 
 function settingsPreload() {
-  settingsBg = loadImage('assets/settings_bg.png')
+  settingsBg = loadImage('assets/backgrounds/wall.png')
 }
 
 /**
