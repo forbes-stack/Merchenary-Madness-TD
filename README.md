@@ -4,6 +4,10 @@
 
 Built with [p5.js](https://p5js.org/) and plain JavaScript.
 
+## ▶ [Play it now in your browser](https://forbes-stack.github.io/Merchenary-Madness-TD/)
+
+No download or install, just open the link. Works on computers and tablets.
+
 ---
 
 ## How to Play
@@ -86,13 +90,10 @@ Waves grow bigger and spawn faster each round, and every 5 rounds (5, 10, 15, ..
 
 ### Play online
 
-The game is a static site, so GitHub Pages can host it without a build step:
-
-1. On GitHub, open **Settings → Pages**.
-2. Under **Build and deployment**, choose **Deploy from a branch**, then select `main` and `/ (root)`.
-3. The game will be live at `https://forbes-stack.github.io/Merchenary-Madness-TD/`, and every push to `main` updates it.
-
-Free GitHub Pages requires a public repository (private repos need GitHub Pro).
+The game is live at **https://forbes-stack.github.io/Merchenary-Madness-TD/**, hosted free on GitHub Pages
+(Settings → Pages → deploy from `main`, `/ (root)`). It's a static site with no build step: every push to `main`
+updates the live game within about a minute. Browsers may cache the old version for up to ~10 minutes;
+Ctrl+F5 loads the newest right away.
 
 ### Run locally
 
