@@ -103,12 +103,16 @@ function createSettingsControls() {
   settingsControls.push(back);
 }
 
-function settingsDraw() {
+// withBackdrop: draw the wood wall behind the panels (start screen). In game the panels
+// sit straight on the dimmed, paused map instead.
+function settingsDraw(withBackdrop = true) {
   push()
   translate(settingsOrigin.x, settingsOrigin.y)
 
   // wood-wall backdrop (center crop of the 1158x650 image)
-  image(settingsBg, 0, 0, SETTINGS_W, SETTINGS_H, (settingsBg.width - SETTINGS_W) / 2, 0, SETTINGS_W, SETTINGS_H)
+  if (withBackdrop) {
+    image(settingsBg, 0, 0, SETTINGS_W, SETTINGS_H, (settingsBg.width - SETTINGS_W) / 2, 0, SETTINGS_W, SETTINGS_H)
+  }
 
   //56,34,0
   //74,45,0

@@ -206,6 +206,24 @@ function mapDraw() {
     return;
   }
 
+  // --- Paused, with Settings open ---
+  // Only the frozen map, towers, and enemies behind the Settings panel: the game's own
+  // controls (palette, tower-slot button, speed button, HUD) are left out so they can't be
+  // confused with, or sit under, the Settings controls.
+  if (isPaused && settingsOpen) {
+    drawMapBackground();
+    for (const t of ui.placedTowers) ui.drawTowerWithAura(t);
+    if (waveManager) waveManager.draw();
+
+    push();
+    fill(0, 0, 0, 160);
+    noStroke();
+    rect(0, 0, width, height);
+    pop();
+    settingsDraw(false); // just the panels, no wood wall
+    return;
+  }
+
   // --- Paused state ---
   if (isPaused) {
     // Draw current game state without updating logic
@@ -224,18 +242,8 @@ function mapDraw() {
     info.draw(ui.placedTowers.length);
     speedButton.draw();
 
-    if (settingsOpen) {
-      // Settings panel centered over the dimmed, paused game
-      push();
-      fill(0, 0, 0, 160);
-      noStroke();
-      rect(0, 0, width, height);
-      pop();
-      settingsDraw();
-    } else {
-      // Pause overlay with Resume / Restart / Settings / Quit to Title
-      ui.displayPauseMenu();
-    }
+    // Pause overlay with Resume / Restart / Settings / Quit to Title
+    ui.displayPauseMenu();
 
     return;
   }
