@@ -128,6 +128,7 @@ assets/               Sprites and backgrounds
 tools/gen_sprites.js  Generates the special-enemy sprite sheets (node tools/gen_sprites.js assets)
 tools/serve.js        Tiny local web server for playing/testing (node tools/serve.js [port])
 tools/extend_title.js Builds assets/start_wide.png, the title drawing extended to fill wide screens
+tools/extend_wall.js  Builds assets/settings_wide.png, the Settings / How to Play wall extended the same way
 functions/layout.js   Scales the game to fit the window
 PRD.md                Requirements, implementation status, and known issues
 ```

@@ -58,8 +58,16 @@ function showHomeButtons(visible) {
 
 function backToHome() {
   page = 'home';
+  setBackdrop('title-screen');
   showHomeButtons(true);
   titleAmbience.start();
+}
+
+// Which picture fills the window around the canvas: the extended title drawing on the
+// title screen, the extended wood wall on Settings / How to Play (see style.css)
+function setBackdrop(name) {
+  document.body.classList.remove('title-screen', 'wood-screen');
+  if (name) document.body.classList.add(name);
 }
 
 function setup() {
@@ -91,8 +99,7 @@ function setup() {
   start_button.mousePressed(() => {
     sfx.unlock(); // browsers only allow audio after a click
     showHomeButtons(false);
-    document.body.classList.remove('title-screen'); // back to the dusty backdrop in game
-    titleAmbience.stop();
+    titleAmbience.stop(); // the desert backdrop stays up through the loading screen
     sfx.stopMenuMusic(); // the gameplay music takes over in mapSetup
     page = 'map';
     console.log('page is map');
@@ -106,6 +113,7 @@ function setup() {
     sfx.unlock();
     showHomeButtons(false);
     titleAmbience.stop();
+    setBackdrop('wood-screen');
     page = 'settings';
     openSettings(backToHome);
   });
@@ -117,6 +125,7 @@ function setup() {
   howto_button.mousePressed(() => {
     showHomeButtons(false);
     titleAmbience.stop();
+    setBackdrop('wood-screen');
     page = 'howto';
     openHowToPlay(backToHome);
   });
@@ -127,19 +136,27 @@ function setup() {
 
 // Pulsing "Click anywhere to ride into town" where the menu buttons will appear
 function drawSplash() {
-  const pulse = 0.65 + 0.35 * Math.sin(millis() / 450)
+  drawBanner('Click anywhere to ride into town')
+}
+
+// Pulsing message on a dark band over the title drawing (splash + loading screen);
+// the band widens for longer messages
+function drawBanner(message) {
+  const pulse = 0.75 + 0.25 * Math.sin(millis() / 450) // never fainter than half
   push()
+  textFont('cursive')
+  textSize(34)
+  const bandW = constrain(textWidth(message) + 60, 520, width - 20)
+  if (textWidth(message) > bandW - 30) textSize(34 * (bandW - 30) / textWidth(message))
   rectMode(CENTER)
   noStroke()
   fill(40, 20, 0, 150)
-  rect(width / 2, 395, 520, 74, 16)
+  rect(width / 2, 395, bandW, 74, 16)
   textAlign(CENTER, CENTER)
-  textFont('cursive')
-  textSize(34)
   stroke(20, 10, 0)
   strokeWeight(5)
   fill(255, 236, 200, 255 * pulse)
-  text('Click anywhere to ride into town', width / 2, 393)
+  text(message, width / 2, 393)
   pop()
 }
 
@@ -168,6 +185,7 @@ function draw() {
     loadScript(sources, () => {
       mapPreload(() => {
         mapSetup();
+        setBackdrop(null); // the dusty in-game backdrop (style.css), now that the map is up
         mapLoaded = true;
       });
     });
@@ -206,15 +224,11 @@ function loadScript(srcArray, callback) {
 }
 
 // shown while the game scripts/images load, or if one of them fails
+// While the game loads: the title drawing (and its extended desert around the canvas)
+// with a pulsing "Loading..." banner, or the error if something failed to load
 function drawLoadingScreen() {
-  push();
-  background(0);
-  fill('white');
-  noStroke();
-  textAlign(CENTER, CENTER);
-  textSize(32);
-  text(loadError || 'Loading...', width / 2, height / 2);
-  pop();
+  image(img, 0, 0);
+  drawBanner(loadError || 'Loading...');
 }
 
 // keep the canvas (start screen or map) fitted to the window

@@ -33,7 +33,16 @@ body.title-screen {
     linear-gradient(to bottom, rgb(122, 106, 186) 50%, rgb(194, 185, 143) 50%);
 }
 
-body.title-screen main {
+/* Settings / How to Play: the wood-plank wall continues past the canvas edges
+   (assets/settings_wide.png, made by tools/extend_wall.js, same size and layout). */
+body.wood-screen {
+  background:
+    url("assets/settings_wide.png") center / var(--title-bg-size, auto) no-repeat,
+    rgb(90, 55, 25);
+}
+
+body.title-screen main,
+body.wood-screen main {
   box-shadow: none; /* the scene continues seamlessly, so no frame */
 }
 
