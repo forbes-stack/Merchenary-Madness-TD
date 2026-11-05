@@ -8,7 +8,7 @@ Built with [p5.js](https://p5js.org/) and plain JavaScript.
 
 ## How to Play
 
-1. Press **Start** on the title screen.
+1. Click anywhere (or press any key) to ride into town, then press **Start** on the title screen.
 2. **Drag** a mercenary from the bottom bar onto open ground. You can't place them on the trail or on top of each other. The preview turns red when you can't place there or can't afford it.
 3. Press **Start Wave** to send in the outlaws. Your mercenaries fire automatically at enemies in range.
 4. Earn gold by taking out outlaws, plus a bonus each time you clear a wave ($20 + $3 per round).
@@ -116,8 +116,9 @@ pages/settings.js     Settings screen: volume sliders, color-blind mode, replay 
 pages/howToPlay.js    How to Play screen
 functions/tutorial.js Guided first-round tutorial
 functions/effects.js  Dust, floating cost text, upgrade sparkles
+functions/titleAmbience.js  Title-screen wind, dust, and tumbleweeds
 functions/gameSettings.js  Saved player settings and the color-blind palettes
-functions/soundFX.js  Synthesized sound effects and music (Web Audio)
+functions/soundFX.js  Synthesized sound effects, menu + gameplay music, and title-screen wind (Web Audio)
 functions/map.js      Main game loop: setup, drawing, input, pause, and restart
 functions/            Path, wave generation, tower dragging, upgrades
 towers/               Tower base class and the Gatling, Cannon, and Sniper towers
@@ -126,6 +127,7 @@ bottomUI/             Tower palette and upgrade menu (ui.js), plus the gold/heal
 assets/               Sprites and backgrounds
 tools/gen_sprites.js  Generates the special-enemy sprite sheets (node tools/gen_sprites.js assets)
 tools/serve.js        Tiny local web server for playing/testing (node tools/serve.js [port])
+tools/extend_title.js Builds assets/start_wide.png, the title drawing extended to fill wide screens
 functions/layout.js   Scales the game to fit the window
 PRD.md                Requirements, implementation status, and known issues
 ```

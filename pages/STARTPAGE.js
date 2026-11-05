@@ -23,6 +23,12 @@ let start_button,
     mapLoaded = false,
     loadError = null
 
+// "Click anywhere to ride into town" splash: browsers block sound until the player
+// interacts, so the first click / tap / key press starts the music and wind and brings in
+// the menu buttons. The desktop app (Electron) allows sound right away, so it skips this.
+const IS_DESKTOP_APP = /Electron/i.test(navigator.userAgent);
+let showSplash = !IS_DESKTOP_APP;
+
     //each js script for map.js (order matters: base classes before subclasses)
 let sources = ['enemies/enemy.js','enemies/basicEnemy.js', 'enemies/fastEnemy.js', 'enemies/tankEnemy.js',
                 'enemies/gridEnemy.js', 'enemies/dynamiteEnemy.js', 'enemies/ghostEnemy.js', 'enemies/docEnemy.js', 'enemies/ironcladEnemy.js',
@@ -53,11 +59,29 @@ function showHomeButtons(visible) {
 function backToHome() {
   page = 'home';
   showHomeButtons(true);
+  titleAmbience.start();
 }
 
 function setup() {
   createCanvas(700, 650);
+  document.body.classList.add('title-screen'); // the title drawing fills the whole window
   canvasLayout.fit();
+  titleAmbience.start(); // wind + tumbleweeds on the title screen
+  sfx.startMenuMusic();  // plays on the title / Settings / How to Play screens
+
+  // Browsers only allow sound after the player interacts: the first click, tap, or key
+  // press anywhere starts the menu music and wind, and dismisses the splash.
+  const firstInteraction = () => {
+    window.removeEventListener('pointerdown', firstInteraction);
+    window.removeEventListener('keydown', firstInteraction);
+    sfx.unlock();
+    if (showSplash) {
+      showSplash = false;
+      if (page === 'home') showHomeButtons(true);
+    }
+  };
+  window.addEventListener('pointerdown', firstInteraction);
+  window.addEventListener('keydown', firstInteraction);
 
   //Startpage Buttons (placed in canvas coordinates; scaled with the canvas)
   start_button = createButton("Start");
@@ -67,6 +91,9 @@ function setup() {
   start_button.mousePressed(() => {
     sfx.unlock(); // browsers only allow audio after a click
     showHomeButtons(false);
+    document.body.classList.remove('title-screen'); // back to the dusty backdrop in game
+    titleAmbience.stop();
+    sfx.stopMenuMusic(); // the gameplay music takes over in mapSetup
     page = 'map';
     console.log('page is map');
   });
@@ -78,6 +105,7 @@ function setup() {
   settings_button.mousePressed(() => {
     sfx.unlock();
     showHomeButtons(false);
+    titleAmbience.stop();
     page = 'settings';
     openSettings(backToHome);
   });
@@ -88,9 +116,31 @@ function setup() {
 
   howto_button.mousePressed(() => {
     showHomeButtons(false);
+    titleAmbience.stop();
     page = 'howto';
     openHowToPlay(backToHome);
   });
+
+  // menu buttons appear once the splash is dismissed (first click / key press)
+  if (showSplash) showHomeButtons(false);
+}
+
+// Pulsing "Click anywhere to ride into town" where the menu buttons will appear
+function drawSplash() {
+  const pulse = 0.65 + 0.35 * Math.sin(millis() / 450)
+  push()
+  rectMode(CENTER)
+  noStroke()
+  fill(40, 20, 0, 150)
+  rect(width / 2, 395, 520, 74, 16)
+  textAlign(CENTER, CENTER)
+  textFont('cursive')
+  textSize(34)
+  stroke(20, 10, 0)
+  strokeWeight(5)
+  fill(255, 236, 200, 255 * pulse)
+  text('Click anywhere to ride into town', width / 2, 393)
+  pop()
 }
 
 function draw() {
@@ -98,6 +148,7 @@ function draw() {
   //background images
   if (page == 'home') {
     image(img, 0, 0)
+    if (showSplash) drawSplash()
   }
 
   if (page == 'settings') {

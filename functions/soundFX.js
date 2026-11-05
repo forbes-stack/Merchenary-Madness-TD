@@ -17,6 +17,12 @@ class SoundFX {
     this.ctx = null;
     this.lastPlayed = {};
     this.musicTimer = null;
+    this.menuTimer = null;
+    this.wind = null;           // running wind nodes, see startWind()
+    // Wanted-but-not-yet-allowed sounds: menu music and wind are asked for as soon as the
+    // title screen shows, but browsers only allow audio after a click or key press.
+    this.wantMenuMusic = false;
+    this.wantWind = false;
   }
 
   // ---------- setup ----------
@@ -47,7 +53,13 @@ class SoundFX {
   /** Call from a click handler: creates/resumes the audio context. */
   unlock() {
     const ctx = this._ensure();
-    if (ctx && ctx.state === "suspended") ctx.resume();
+    if (!ctx) return;
+    const startWanted = () => {
+      if (this.wantMenuMusic) this.startMenuMusic();
+      if (this.wantWind) this.startWind();
+    };
+    if (ctx.state === "suspended") ctx.resume().then(startWanted);
+    else startWanted();
   }
 
   /** Re-read volumes from gameSettings (called when a slider moves). */
@@ -163,6 +175,25 @@ class SoundFX {
         this._tone(t, { type: "triangle", f0: 2400, f1: 2100, dur: 0.09, gain: 0.12 });
         this._tone(t, { type: "sine", f0: 3550, f1: 3300, dur: 0.06, gain: 0.08 });
         break;
+      case "gust": { // a gust of wind blowing a tumbleweed in: swelling, rising whoosh
+        const src = this.ctx.createBufferSource();
+        const flt = this.ctx.createBiquadFilter();
+        const amp = this.ctx.createGain();
+        src.buffer = this.noiseBuffer;
+        src.loop = true;
+        flt.type = "bandpass";
+        flt.Q.value = 1.2;
+        flt.frequency.setValueAtTime(300, t);
+        flt.frequency.exponentialRampToValueAtTime(1100, t + 0.9);
+        flt.frequency.exponentialRampToValueAtTime(500, t + 1.8);
+        amp.gain.setValueAtTime(0.0001, t);
+        amp.gain.exponentialRampToValueAtTime(0.35, t + 0.7);
+        amp.gain.exponentialRampToValueAtTime(0.0001, t + 1.9);
+        src.connect(flt).connect(amp).connect(this.sfxBus);
+        src.start(t);
+        src.stop(t + 2);
+        break;
+      }
       case "escape":
         this._tone(t, { type: "square", f0: 440, f1: 220, dur: 0.3, gain: 0.15 });
         break;
@@ -239,6 +270,116 @@ class SoundFX {
       clearInterval(this.musicTimer);
       this.musicTimer = null;
     }
+  }
+
+  // ---------- menu music: a slow, lonesome tune for the title / settings screens ----------
+  // E minor: Em - C - G - D, plucked guitar arpeggios under a whistled melody.
+
+  startMenuMusic() {
+    this.wantMenuMusic = true;
+    const ctx = this._ensure();
+    if (!ctx || ctx.state !== "running" || this.menuTimer) return; // starts on unlock()
+
+    const eighth = 60 / 76 / 2; // 76 bpm
+    const chords = [
+      [82.4, 123.5, 164.8, 196.0],  // Em
+      [130.8, 196.0, 261.6, 329.6], // C
+      [98.0, 146.8, 196.0, 246.9],  // G
+      [146.8, 220.0, 293.7, 370.0], // D
+    ];
+    const pluckOrder = [0, 1, 2, 3, 2, 1, 2, 1];
+    // whistled melody, one entry per eighth note (Hz, or 0 = rest), 4 bars
+    const melody = [
+      494, 0, 0, 440, 392, 0, 0, 0,
+      330, 0, 392, 0, 440, 0, 0, 0,
+      392, 0, 0, 330, 294, 0, 330, 0,
+      370, 0, 0, 0, 0, 0, 0, 0,
+    ];
+
+    let step = 0;
+    let nextTime = ctx.currentTime + 0.3;
+    const schedule = () => {
+      while (nextTime < ctx.currentTime + 0.3) {
+        const bar = Math.floor(step / 8) % 4;
+        const beat = step % 8;
+        // plucked string: triangle with a quick decay
+        const f = chords[bar][pluckOrder[beat]];
+        this._tone(nextTime, { type: "triangle", f0: f, dur: eighth * 2.2, gain: beat === 0 ? 0.2 : 0.12, bus: this.musicBus });
+        // low bass note on the first beat of each bar
+        if (beat === 0) this._tone(nextTime, { f0: chords[bar][0] / 2, dur: eighth * 6, gain: 0.18, bus: this.musicBus });
+
+        // the melody only every other time round, so the guitar gets a verse alone
+        const verse = Math.floor(step / 32) % 2;
+        const note = melody[step % melody.length];
+        if (note && verse === 1) {
+          let len = 1;
+          while (len < 6 && !melody[(step + len) % melody.length]) len++;
+          this._tone(nextTime, { f0: note, dur: eighth * len * 0.95, gain: 0.08, bus: this.musicBus, vibrato: 5 });
+        }
+        step++;
+        nextTime += eighth;
+      }
+    };
+    schedule();
+    this.menuTimer = setInterval(schedule, 50);
+  }
+
+  stopMenuMusic() {
+    this.wantMenuMusic = false;
+    if (this.menuTimer) {
+      clearInterval(this.menuTimer);
+      this.menuTimer = null;
+    }
+  }
+
+  // ---------- wind: a continuous breeze that rises and falls in gusts ----------
+  // Two filtered-noise layers (a low rumble and a thin whistle) whose loudness and pitch
+  // drift to new random targets every couple of seconds.
+
+  startWind() {
+    this.wantWind = true;
+    const ctx = this._ensure();
+    if (!ctx || ctx.state !== "running" || this.wind) return; // starts on unlock()
+
+    const layer = (type, freq, q) => {
+      const src = ctx.createBufferSource();
+      const flt = ctx.createBiquadFilter();
+      const amp = ctx.createGain();
+      src.buffer = this.noiseBuffer;
+      src.loop = true;
+      flt.type = type;
+      flt.frequency.value = freq;
+      flt.Q.value = q;
+      amp.gain.value = 0.0001;
+      src.connect(flt).connect(amp).connect(this.sfxBus);
+      src.start();
+      return { src, flt, amp };
+    };
+    const rumble = layer("lowpass", 350, 0.7);
+    const whistle = layer("bandpass", 800, 6);
+
+    const gust = () => {
+      const t = ctx.currentTime;
+      const strength = Math.random();
+      rumble.amp.gain.setTargetAtTime(0.06 + strength * 0.12, t, 0.9);
+      rumble.flt.frequency.setTargetAtTime(250 + strength * 450, t, 0.9);
+      whistle.amp.gain.setTargetAtTime(0.01 + strength * 0.05, t, 1.1);
+      whistle.flt.frequency.setTargetAtTime(600 + Math.random() * 700, t, 1.4);
+    };
+    gust();
+    this.wind = { layers: [rumble, whistle], timer: setInterval(gust, 1800 + Math.random() * 900) };
+  }
+
+  stopWind() {
+    this.wantWind = false;
+    if (!this.wind) return;
+    clearInterval(this.wind.timer);
+    const t = this.ctx.currentTime;
+    for (const l of this.wind.layers) {
+      l.amp.gain.setTargetAtTime(0.0001, t, 0.25); // quick fade instead of a click
+      l.src.stop(t + 1.2);
+    }
+    this.wind = null;
   }
 }
 
